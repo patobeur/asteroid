@@ -20,7 +20,7 @@ class Asteroid {
 	createAndAddCss = () => {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background: #28282b}'
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 0.7rem;color: white;}'
-		stringcss += '.ship.visual {background-image: url(/assets/img/ship.svg);background-position: center center;background-size: cover;background-repeat:no-repeat}'
+		stringcss += '.ship.visual {background-image: url(assets/img/ship.svg);background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		this.addCss(stringcss, 'main')
 	}
