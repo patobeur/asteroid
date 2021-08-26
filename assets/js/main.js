@@ -1,5 +1,5 @@
 "use strict";
-class asteroid {
+class Asteroid {
 	constructor() {
 		this.Pause = false;
 		this.actualplayer = 0;
@@ -10,6 +10,7 @@ class asteroid {
 		this.players = this.playersManager()
 		this.stars = this.starsManager()
 		this.projectils = this.projectilsManager()
+		this.asteroids = this.asteroidsManager()
 		this.proj = () => {
 			return this.projectils.length
 		}
@@ -19,7 +20,7 @@ class asteroid {
 	createAndAddCss = () => {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background: #28282b}'
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 0.7rem;color: white;}'
-		stringcss += ''
+		stringcss += '.ship.visual {background-image: url(/assets/img/ship.svg);background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		this.addCss(stringcss, 'main')
 	}
@@ -226,6 +227,29 @@ class asteroid {
 		}
 		return datas
 	}
+	asteroidsManager = () => {
+		let data = {
+			asteroids: [],
+			// create: (size) => {
+			// 	let immat = this.asteroids.asteroids.length
+			// 	let asteroid = {
+			// 		immat: immat,
+			// 		speed: 10,
+			// 		x: player.ship.x,// - ( player.ship.w/2),
+			// 		y: player.ship.y,// - ( player.ship.h/2),
+			// 		z: player.ship.z,// - ( player.ship.l/2), // 3d
+			// 		w: 5,
+			// 		h: 12,
+			// 		l: 5, // 3d
+			// 		orbitdelay: [0, 50], // current,orbit refreh delay 
+			// 		range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
+			// 	}
+			// 	this.asteroids.add(asteroid)
+			// },
+		}
+		return data
+
+	}
 	projectilsManager = () => {
 		let data = {
 			projectils: [],
@@ -251,8 +275,9 @@ class asteroid {
 					range: projectil.range ?? { x: 10, y: 10, z: 10 }, // range of orbit effect in pixels
 					div: Object
 				}
-				projectil.div = this.divmaker_projectils(projectil.type, projectil, player)
+				projectil.div = this.divmaker(projectil.type, projectil, player)
 				this.projectils.projectils.push(projectil)
+				this.projectils.update_DivPos(projectil)
 				this.projectils.addtodom(projectil)
 			},
 			addtodom: (projectil) => {
@@ -265,15 +290,15 @@ class asteroid {
 					playerimmat: player.immat,
 					d: player.ship.d,
 					speed: 10,
-					x: player.ship.x,// - ( player.ship.w/2),
-					y: player.ship.y,// - ( player.ship.h/2),
-					z: player.ship.z,// - ( player.ship.l/2), // 3d
-					lifedelay: { current: 0, max: 100 },
+					x: player.ship.x,// + (player.ship.w / 2),
+					y: player.ship.y,// + (player.ship.h / 2),
+					z: player.ship.z,// + (player.ship.l / 2), // 3d
+					lifedelay: { current: 0, max: 70 },
 					w: 5,
-					h: 12,
+					h: 5,
 					l: 5, // 3d
-					type: 'icecube',
-					visual: '🧊',
+					type: type,
+					visual: '.',//🧊
 					orbitdelay: [0, 50], // current,orbit refreh delay 
 					range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
 				}
@@ -283,11 +308,10 @@ class asteroid {
 				projectil.x = projectil.x + (projectil.speed * Math.cos((projectil.d) * (Math.PI / 180)))
 				projectil.y = projectil.y + (projectil.speed * Math.sin((projectil.d) * (Math.PI / 180)))
 				// div refresh attributes
-				projectil.div.style.left = ((projectil.x)) + 'px'
-				projectil.div.style.top = ((projectil.y)) + 'px'
+				projectil.div.style.left = ((projectil.x - (projectil.w / 2))) + 'px'
+				projectil.div.style.top = ((projectil.y - (projectil.h / 2))) + 'px'
 				projectil.div.style.zIndex = parseInt((projectil.z - (projectil.l / 2))) // dreamming to make this 3d
 				projectil.div.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
-				projectil.div.style.backgroundColor = 'green'
 
 			}
 		}
@@ -296,7 +320,7 @@ class asteroid {
 	shipManager(type) {
 		let immat = this.players.players.lenght
 		return {
-			visual: '🌵',//🢁🢙🡁🢙⇧
+			// visual: '🌵',//🢁🢙🡁🢙⇧
 			immat: this.immat,
 			x: this.center.x,
 			y: this.center.y,
@@ -305,9 +329,9 @@ class asteroid {
 			dstep: 45, // rotation steps for changedir()
 			speed: 1,
 			speedrange: { min: -2, max: 5 },
-			w: 48,
-			h: 48,
-			l: 48, // 3d
+			w: 8,
+			h: 16,
+			l: 8, // 3d
 			type: 'ship',
 			tetha: 0,
 			div: this.divmaker(type),
@@ -356,41 +380,41 @@ class asteroid {
 			},
 		}
 	}
-	divmaker_projectils = (type, projectil, player) => {
-		// console.log(projectil)
+	divmaker_projectils = (type, item, player) => {
+		// console.log(item)
 		let obj = document.createElement("div")
 		if (type === 'icecube') {
 			obj.style.position = 'absolute'
-			obj.style.width = projectil.w + 'px'
-			obj.style.height = projectil.h + 'px'
-			obj.style.left = projectil.x + 'px'
-			obj.style.top = projectil.y + 'px'
-			obj.style.zIndex = parseInt(projectil.z - (projectil.l / 2)) // 3d
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
 			obj.style.color = 'white'
-			obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			// obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
 
-			obj.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
 			let visual = document.createElement('div')
 			visual.style.position = 'absolute'
 			// visual.className='visual'
-			visual.style.width = projectil.range.x + 'px'
-			visual.style.height = projectil.range.y + 'px'
-			visual.textContent = projectil.visual//⇧
+			visual.style.width = item.range.x + 'px'
+			visual.style.height = item.range.y + 'px'
+			visual.textContent = item.visual
 			visual.style.display = 'flex'
 			visual.style.justifyContent = 'center'
 			visual.style.alignItems = 'center'
+
 			let range = document.createElement('div')
 			range.style.position = 'absolute'
-			// range.className='range'
-			range.textContent = '⇧'//⇧
-			range.style.width = projectil.range.x + 'px'
-			range.style.height = projectil.range.y + 'px'
+			range.className = type + ' range'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
 			range.style.borderRadius = '50%'
-			range.style.backgroundColor = 'rgba(255, 255, 0, 0.234)'
-			range.style.border = '3px dotted rgba(255,255, 255, .2)'
+			// range.style.backgroundColor = 'rgba(255, 255, 0, 0.234)'
+			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
 			range.style.display = 'flex'
 			range.style.justifyContent = 'center'
 			range.style.alignItems = 'start'
@@ -400,38 +424,77 @@ class asteroid {
 
 		return obj;
 	}
-	divmaker = (type, element, player) => {
+	divmaker = (type, item, player) => {
 		// type Player || Asteroid
 		let obj = document.createElement("div")
+		obj.className = type
 		if (type === 'ship') {
 			obj.style.position = 'absolute'
-			obj.style.width = '58px' // 3*3rem
-			obj.style.height = '58px' // 3*3rem
+			obj.style.width = '8px' // 3*3rem
+			obj.style.height = '16px' // 3*3rem
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
-			obj.style.borderRadius = '50%'
+			obj.style.color = 'white'
+			// obj.style.backgroundColor = 'rgba(0, 0, 0, 1)'
+			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let visual = document.createElement('div')
+			visual.className = 'ship visual'
+			visual.style.position = 'absolute'
+			visual.style.width = '8px'
+			visual.style.height = '16px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let range = document.createElement('div')
+			range.style.position = 'absolute'
+			range.className = 'ship range'
+			range.style.width = '60px' // 3*3rem
+			range.style.height = '60px' // 3*3rem
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'icecube') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
 			obj.style.color = 'white'
 			// obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
 
 			let visual = document.createElement('div')
 			visual.style.position = 'absolute'
 			// visual.className='visual'
-			visual.style.width = '58px' // 3*3rem
-			visual.style.height = '58px' // 3*3rem
-			visual.textContent = '🌵'//⇧
+			visual.style.width = item.range.x + 'px'
+			visual.style.height = item.range.y + 'px'
+			visual.textContent = item.visual
 			visual.style.display = 'flex'
 			visual.style.justifyContent = 'center'
 			visual.style.alignItems = 'center'
+
 			let range = document.createElement('div')
 			range.style.position = 'absolute'
-			// range.className='range'
-			range.textContent = '⇧'//⇧
-			range.style.width = '60px' // 3*3rem
-			range.style.height = '60px' // 3*3rem
+			range.className = type + ' range'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
 			range.style.borderRadius = '50%'
-			range.style.backgroundColor = 'rgba(255, 255, 0, 0.234)'
-			range.style.border = '3px dotted rgba(255,255, 255, .2)'
+			// range.style.backgroundColor = 'rgba(255, 255, 0, 0.234)'
+			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
 			range.style.display = 'flex'
 			range.style.justifyContent = 'center'
 			range.style.alignItems = 'start'
@@ -439,39 +502,39 @@ class asteroid {
 			obj.appendChild(visual)
 		}
 		else if (type === 'cosmos') {
-			obj.style.position = 'absolute'
-			obj.style.width = '1000px' // 3*3rem
-			obj.style.height = '1000px' // 3*3rem
-			obj.style.top = '-500px' // 3*3rem
-			obj.style.left = '-500px' // 3*3rem
-			// obj.style.display = 'flex'
-			// obj.style.justifyContent = 'center'
-			// obj.style.alignItems = 'center'
-			// obj.style.borderRadius = '50%'
-			obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
+			// obj.style.position = 'absolute'
+			// obj.style.width = '1000px' // 3*3rem
+			// obj.style.height = '1000px' // 3*3rem
+			// obj.style.top = '-500px' // 3*3rem
+			// obj.style.left = '-500px' // 3*3rem
+			// // obj.style.display = 'flex'
+			// // obj.style.justifyContent = 'center'
+			// // obj.style.alignItems = 'center'
+			// // obj.style.borderRadius = '50%'
+			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
 		}
 		else if (type === 'star') {
 			obj.style.position = 'absolute'
-			obj.style.width = element.w + 'px'
-			obj.style.height = element.w + 'px'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.w + 'px'
 			obj.style.top = this.center.y + 'px'
 			obj.style.left = this.center.x + 'px'
-			obj.style.backgroundColor = 'rgba(255,255, 255, 0.2)'
+			// obj.style.backgroundColor = 'rgba(255,255, 255, 0.05)'
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
 			obj.style.borderRadius = '50%'
 			let visual = document.createElement('div')
-			// visual.className='visual'
-			visual.textContent = element.visual
+			visual.className = type + ' visual'
+			// visual.textContent = item.visual
 			let range = document.createElement('div')
-			// range.className=''
+			range.className = type + ' visual'
 			range.style.position = 'absolute'
-			range.style.width = element.range.x + 'px'
-			range.style.height = element.range.y + 'px'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
 			range.style.borderRadius = '50%'
-			range.style.border = '3px dotted rgba(255,255, 255, .2)'
-			range.style.backgroundColor = 'rgba(255,255, 255, .1)'
+			range.style.border = '3px dotted rgba(255,255, 255, .05)'
+			// range.style.backgroundColor = 'rgba(255,255, 255, .1)'
 			obj.appendChild(range)
 			obj.appendChild(visual)
 		}
@@ -540,6 +603,6 @@ class asteroid {
 	// }
 }
 let isLoaded = () => {
-	let Asteroid = new asteroid()
+	let GameAsteroid = new Asteroid()
 }
 window.addEventListener('load', isLoaded, false)
