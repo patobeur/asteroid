@@ -273,7 +273,7 @@ class asteroid {
 					h: 12,
 					l: 5, // 3d
 					type: 'icecube',
-					visual: 'o',
+					visual: '🧊',
 					orbitdelay: [0, 50], // current,orbit refreh delay 
 					range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
 				}
