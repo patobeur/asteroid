@@ -272,7 +272,7 @@ class Asteroid {
 	asteroidsManager = () => {
 		let data = {
 			asteroids: [],
-			max: 5,
+			max: 8,
 			speeds: { 0: 5 },
 			create: (e) => {
 				for (let i = 0; i < this.asteroids.max; i++) {
@@ -289,7 +289,7 @@ class Asteroid {
 						l: 32, // 3d
 						d: this.aleaEntreBornes(1, 360),
 						pts: 100,
-						lv: 1,
+						lv: this.aleaEntreBornes(1, 3),
 						div: Object
 					}
 					this.asteroids.addtostack(asteroid)
@@ -379,7 +379,7 @@ class Asteroid {
 					x: ship.x,// + (ship.w / 2),
 					y: ship.y,// + (ship.h / 2),
 					z: ship.z,// + (ship.l / 2), // 3d
-					lifedelay: { current: 0, max: 20 },
+					lifedelay: { current: 0, max: 100 },
 					w: 5,
 					h: 5,
 					l: 5, // 3d
