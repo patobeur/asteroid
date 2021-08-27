@@ -21,7 +21,7 @@ class Asteroid {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 0.7rem;color: white;}'
-		stringcss += '#devmire {position: absolute;background-image: url("/assets/img/center_testing_visual_white.svg");background-attachment: fixed;background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '#devmire {position: absolute;background-image: url("assets/img/center_testing_visual_white.svg");background-attachment: fixed;background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.ship.visual {background-image: url(assets/img/ship.svg);background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		this.addCss(stringcss, 'main')
 	}
