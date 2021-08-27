@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.0" id="mire" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 256 256" style="enable-background:new 0 0 256 256;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:10;}
+	.st1{font-family:'MyriadPro-Regular';}
+	.st2{font-size:12px;}
+</style>
+<g id="vz">
+	<g id="XMLID_23_">
+		<line id="XMLID_26_" class="st0" x1="174.6" y1="81.4" x2="9.5" y2="246.5"/>
+		<g id="XMLID_24_">
+			<polygon id="XMLID_25_" points="172.3,80.2 177.1,78.9 175.8,83.7 			"/>
+		</g>
+	</g>
+</g>
+<g id="vx">
+	<g id="XMLID_18_">
+		<line id="XMLID_21_" class="st0" x1="9.5" y1="13" x2="9.5" y2="246.5"/>
+		<g id="XMLID_19_">
+			<polygon id="XMLID_20_" points="7,13.8 9.5,9.5 11.9,13.8 			"/>
+		</g>
+	</g>
+</g>
+<g id="vy">
+	<g id="XMLID_13_">
+		<line id="XMLID_16_" class="st0" x1="243" y1="246.5" x2="9.5" y2="246.5"/>
+		<g id="XMLID_14_">
+			<polygon id="XMLID_15_" points="242.2,244 246.5,246.5 242.2,249 			"/>
+		</g>
+	</g>
+</g>
+<text id="XMLID_1_" transform="matrix(1 0 0 1 13.2542 21.1411)" class="st1 st2">x</text>
+<text id="XMLID_2_" transform="matrix(1 0 0 1 174.0788 92.9621)" class="st1 st2">z</text>
+<text id="XMLID_3_" transform="matrix(1 0 0 1 235.5906 241.0718)" class="st1 st2">y</text>
+</svg>
