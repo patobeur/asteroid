@@ -17,9 +17,6 @@ class Asteroid {
 		}
 		this.createAndAddCss()
 		this.startGame()
-
-
-
 	}
 	createAndAddCss = () => {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
@@ -49,7 +46,7 @@ class Asteroid {
 		this.asteroids.create()
 
 		setInterval(() => { this.render() }, 100);
-		this.addeventkey()
+		this.addEventKey()
 	}
 	render = () => {
 		if (!this.Pause) {
@@ -61,75 +58,12 @@ class Asteroid {
 			this.players.renderPlayer()
 		}
 	}
-	check_PlayerMoves = (player) => {
-		let star = this.stars.stars[0]
-		let ship = player.ships.ships[player.currentship]
-		// let distance = this.get_distance(player,star)
-		let x = ship.x
-		let y = ship.y
-		let z = ship.z // 3d
-		let d = ship.d
-		let speed = ship.speed
-		// let dRatio = parseInt(d / 360 * 100000) / 100000 // 0.0 to 1
-
-		// 0:'normal', 1:'nogravity', 2:'ia', 3:'orbit', 4:'polar'
-		if (ship.mods.move === 0) { // normal move mods
-			// to do
-			// console.log(d)
-			ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
-			ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
-		}
-		else if (ship.mods.move === 1) { // nogravity ??
-			// to do
-			ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
-			ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
-		}
-		else if (ship.mods.move === 2) { // ia
-			// to do
-		}
-		else if (ship.mods.move === 3) { // orbit
-			// star center pos
-			let starx = star.x + (star.w / 2)
-			let stary = star.y + (star.h / 2)
-			let starw = star.range.x / 2
-			let starh = star.range.y / 2
-			let starl = star.range.z / 2 // z-index
-			// new pos
-			let x2 = 0
-			let y2 = 0
-			let distance = this.get_distance(player, star)
-			if (distance > 0) { // need modification
-				x2 = starx + Math.round((distance) * (Math.cos(ship.d * (180 / Math.PI))));
-				y2 = stary + Math.round((distance) * (Math.sin(ship.d * (180 / Math.PI))));
-				ship.d += 1
-			}
-			else {
-				x2 = starx + Math.round(starw * (Math.cos(ship.d * (180 / Math.PI))));
-				y2 = stary + Math.round(starh * (Math.sin(ship.d * (180 / Math.PI))));
-				ship.d += 1
-			}
-			// saving new pos in obj
-			ship.x = x2 - (ship.w / 2)
-			ship.y = y2 - (ship.h / 2)
-			// if(ship.d >360){ship.d=1}
-		}
-		else if (ship.mods.move === 4) { // polar coordinate 
-			if (ship.d === 360 || ship.d === 0) { ship.y -= ship.speed } // N
-			if (ship.d === 45) { ship.x += ship.speed; ship.y -= ship.speed } // NE
-			if (ship.d === 90) { ship.x += ship.speed; } // E
-			if (ship.d === 135) { ship.x += ship.speed; ship.y += ship.speed } // SE
-			if (ship.d === 180) { ship.y += ship.speed } // S
-			if (ship.d === 225) { ship.x -= ship.speed; ship.y += ship.speed } // SW
-			if (ship.d === 270) { ship.x -= ship.speed; } // W
-			if (ship.d === 315) { ship.x -= ship.speed; ship.y -= ship.speed } // NW
-		}
-	}
 	starsManager = () => {
 		let datas = {
 			stars: [],
 			add: () => {
 				for (let index = 0; index < this.stars.stars.length; index++) {
-					this.stars.stars[index].div = this.divmaker('star', this.stars.stars[index]);
+					this.stars.stars[index].div = this.divMaker('star', this.stars.stars[index]);
 					this.stars.addtodom(this.stars.stars[index])
 				}
 			},
@@ -233,9 +167,9 @@ class Asteroid {
 							// player.ships.ships.forEach(ship => {
 							if (player.ships.ships[player.currentship].mods) {
 								player.checkdir(player)
-								this.check_PlayerMoves(player)
-								this.check_ShipPos(player)
-								this.update_ShipDivPos(player)
+								this.players.check_PlayerMoves(player)
+								this.players.check_ShipPos(player)
+								this.players.update_ShipDivPos(player)
 								this.players.refreshconsole(player)
 							}
 							else {
@@ -247,6 +181,90 @@ class Asteroid {
 					});
 				}
 				else this.setBugAndPause('no player define')
+			},
+			check_ShipPos: (player) => { // check out screen position
+				let ship = player.ships.ships[player.currentship]
+				if (ship.mods.moves[ship.mods.move] != 'orbit') {
+					if (ship.x > (this.screen.w + (ship.w / 2))) { ship.x = 1 }
+					if (ship.y > (this.screen.h + (ship.h / 2))) { ship.y = 1 }
+					if (ship.z > (this.screen.l + (ship.l / 2))) { ship.z = 1 } // 3d
+					if (ship.x < (0 - (ship.w / 2))) { ship.x = this.screen.w - 1 }
+					if (ship.y < (0 - (ship.h / 2))) { ship.y = this.screen.h - 1 }
+					if (ship.z < (0 - (ship.l / 2))) { ship.z = this.screen.h - 1 } // 3d
+				}
+			},
+			update_ShipDivPos: (player) => {
+				let ship = player.ships.ships[player.currentship]
+				ship.div.style.left = ((ship.x - (ship.w / 2))) + 'px'
+				ship.div.style.top = ((ship.y - (ship.h / 2))) + 'px'
+				ship.div.style.zIndex = ((ship.z - (ship.l / 2))) // 3d
+				// (have to clean my mind with the mess radian/degrees & and html rotate
+				// html/css = 0deg for north
+				// and js math = -90 for north WTF ?? 
+				ship.div.style.transform = 'rotate(' + (ship.d + 90) + 'deg)'
+			},
+			check_PlayerMoves: (player) => {
+				let star = this.stars.stars[0]
+				let ship = player.ships.ships[player.currentship]
+				// let distance = this.get_distance(player,star)
+				let x = ship.x
+				let y = ship.y
+				let z = ship.z // 3d
+				let d = ship.d
+				let speed = ship.speed
+				// let dRatio = parseInt(d / 360 * 100000) / 100000 // 0.0 to 1
+
+				// 0:'normal', 1:'nogravity', 2:'ia', 3:'orbit', 4:'polar'
+				if (ship.mods.move === 0) { // normal move mods
+					// to do
+					// console.log(d)
+					ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
+					ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
+				}
+				else if (ship.mods.move === 1) { // nogravity ??
+					// to do
+					ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
+					ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
+				}
+				else if (ship.mods.move === 2) { // ia
+					// to do
+				}
+				else if (ship.mods.move === 3) { // orbit
+					// star center pos
+					let starx = star.x + (star.w / 2)
+					let stary = star.y + (star.h / 2)
+					let starw = star.range.x / 2
+					let starh = star.range.y / 2
+					let starl = star.range.z / 2 // z-index
+					// new pos
+					let x2 = 0
+					let y2 = 0
+					let distance = this.get_distance(player, star)
+					if (distance > 0) { // need modification
+						x2 = starx + Math.round((distance) * (Math.cos(ship.d * (180 / Math.PI))));
+						y2 = stary + Math.round((distance) * (Math.sin(ship.d * (180 / Math.PI))));
+						ship.d += 1
+					}
+					else {
+						x2 = starx + Math.round(starw * (Math.cos(ship.d * (180 / Math.PI))));
+						y2 = stary + Math.round(starh * (Math.sin(ship.d * (180 / Math.PI))));
+						ship.d += 1
+					}
+					// saving new pos in obj
+					ship.x = x2 - (ship.w / 2)
+					ship.y = y2 - (ship.h / 2)
+					// if(ship.d >360){ship.d=1}
+				}
+				else if (ship.mods.move === 4) { // polar coordinate 
+					if (ship.d === 360 || ship.d === 0) { ship.y -= ship.speed } // N
+					if (ship.d === 45) { ship.x += ship.speed; ship.y -= ship.speed } // NE
+					if (ship.d === 90) { ship.x += ship.speed; } // E
+					if (ship.d === 135) { ship.x += ship.speed; ship.y += ship.speed } // SE
+					if (ship.d === 180) { ship.y += ship.speed } // S
+					if (ship.d === 225) { ship.x -= ship.speed; ship.y += ship.speed } // SW
+					if (ship.d === 270) { ship.x -= ship.speed; } // W
+					if (ship.d === 315) { ship.x -= ship.speed; ship.y -= ship.speed } // NW
+				}
 			}
 		}
 		return datas
@@ -278,7 +296,7 @@ class Asteroid {
 				}
 			},
 			addtostack: (asteroid) => {
-				asteroid.div = this.divmaker(asteroid.type, asteroid, false)
+				asteroid.div = this.divMaker(asteroid.type, asteroid, false)
 				this.asteroids.asteroids.push(asteroid)
 				// this.asteroids.update_DivPos(asteroid)
 				this.asteroids.addtodom(asteroid)
@@ -309,7 +327,26 @@ class Asteroid {
 				if (this.asteroids.asteroids[0]) {
 					this.asteroids.asteroids.forEach(asteroid => {
 						this.asteroids.update_DivPos(asteroid)
-						this.check_collisions(asteroid)
+						this.asteroids.check_collisions(asteroid)
+					})
+				}
+			},
+			check_collisions: (asteroid) => {
+				let alertedistancebeforedie = 30
+				// CHECK COLLiSION with projectils
+				if (this.projectils.projectils[0]) {
+					this.projectils.projectils.forEach(projectil => {
+						let distance = this.get_distance(asteroid, projectil);
+						if (!projectil.unarmed) {
+							if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
+								this.projectils.addToDeletation(projectil)
+								console.log('boom: ' + asteroid.immat)
+								asteroid.unarmed = true
+								asteroid.div.style.backgroundColor = "black"
+								asteroid.div.classList.add('unarmed')
+								asteroid.div.textContent = "BOOM"
+							}
+						}
 					})
 				}
 			}
@@ -323,7 +360,7 @@ class Asteroid {
 			projectilstodelete: [],
 			speeds: { icecube: 5 },
 			add: (projectil, player) => {
-				projectil.div = this.divmaker(projectil.type, projectil, player)
+				projectil.div = this.divMaker(projectil.type, projectil, player)
 				this.projectils.projectils.push(projectil)
 				this.projectils.update_DivPos(projectil)
 				this.projectils.addtodom(projectil)
@@ -470,13 +507,13 @@ class Asteroid {
 						}
 					},
 				}
-				ship.div = this.divmaker('ship', ship, player)
+				ship.div = this.divMaker('ship', ship, player)
 				return ship
 			}
 		}
 		return data
 	}
-	divmaker = (type, item, player) => {
+	divMaker = (type, item, player) => {
 		// type Player || Asteroid
 		let obj = document.createElement("div")
 		obj.className = type
@@ -634,7 +671,7 @@ class Asteroid {
 		}
 		return obj;
 	}
-	addeventkey = () => {
+	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
 			// console.log(eventkeydown.key)
 
@@ -664,27 +701,6 @@ class Asteroid {
 		}, true)
 
 	}
-	check_ShipPos = (player) => { // check out screen position
-		let ship = player.ships.ships[player.currentship]
-		if (ship.mods.moves[ship.mods.move] != 'orbit') {
-			if (ship.x > (this.screen.w + (ship.w / 2))) { ship.x = 1 }
-			if (ship.y > (this.screen.h + (ship.h / 2))) { ship.y = 1 }
-			if (ship.z > (this.screen.l + (ship.l / 2))) { ship.z = 1 } // 3d
-			if (ship.x < (0 - (ship.w / 2))) { ship.x = this.screen.w - 1 }
-			if (ship.y < (0 - (ship.h / 2))) { ship.y = this.screen.h - 1 }
-			if (ship.z < (0 - (ship.l / 2))) { ship.z = this.screen.h - 1 } // 3d
-		}
-	}
-	update_ShipDivPos = (player) => {
-		let ship = player.ships.ships[player.currentship]
-		ship.div.style.left = ((ship.x - (ship.w / 2))) + 'px'
-		ship.div.style.top = ((ship.y - (ship.h / 2))) + 'px'
-		ship.div.style.zIndex = ((ship.z - (ship.l / 2))) // 3d
-		// (have to clean my mind with the mess radian/degrees & and html rotate
-		// html/css = 0deg for north
-		// and js math = -90 for north WTF ?? 
-		ship.div.style.transform = 'rotate(' + (ship.d + 90) + 'deg)'
-	}
 	aleaEntreBornes(minimum, maximum) {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 	}
@@ -700,51 +716,10 @@ class Asteroid {
 		}
 
 	}
-
 	get_distance = (a, b) => { // get hypotenus with pythaGore
 		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
 		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
 		return Math.sqrt((AB * AB) + (AC * AC))
-	}
-	check_collisions = (asteroid) => {
-		let alertedistancebeforedie = 30
-		// CHECK COLLiSION with projectils
-		if (this.projectils.projectils[0]) {
-			this.projectils.projectils.forEach(projectil => {
-				let distance = this.get_distance(asteroid, projectil);
-				if (!projectil.unarmed) {
-					if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
-						this.projectils.addToDeletation(projectil)
-						console.log('boom: ' + asteroid.immat)
-						asteroid.unarmed = true
-						asteroid.div.style.backgroundColor = "red"
-						asteroid.div.classList.add('unarmed')
-						asteroid.div.textContent = "BOOM"
-					}
-				}
-				//console.log(distance)
-			})
-		}
-		// this.MF[typeobj].forEach(objB => {
-		// 	if (objB.immat != obj.immat) {
-		// 		let distance = this.get_distance(obj, objB);
-		// 		// die alert range test only for player right now
-		// 		if (obj.objtype === 'player') {
-		// 			// self range test (explode condition here)
-		// 			(distance < ((obj.sizwhl.w / 2) + (objB.sizwhl.w / 2)))
-		// 				? obj.collide.collideself = true
-		// 				: '';
-		// 		}
-		// 		((distance - alertedistancebeforedie) < ((obj.sizwhl.w / 2) + (objB.sizwhl.w / 2)))
-		// 			? obj.collide.collidealert = true
-		// 			: '';
-		// 		// rangea test
-		// 		(distance < ((obj.sizwhl.w * 2) + (objB.sizwhl.w)))
-		// 			? obj.collide.colliderangea = true
-		// 			: '';
-		// 		this.check_collisionsDirectives(obj, objB)
-		// 	}
-		// });
 	}
 }
 let isLoaded = () => {
