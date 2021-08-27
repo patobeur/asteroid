@@ -17,6 +17,9 @@ class Asteroid {
 		}
 		this.createAndAddCss()
 		this.startGame()
+
+
+
 	}
 	createAndAddCss = () => {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
@@ -317,7 +320,7 @@ class Asteroid {
 					h: 5,
 					l: 5, // 3d
 					type: type,
-					visual: '.',//🧊
+					visual: '|',//🧊
 					orbitdelay: [0, 50], // current,orbit refreh delay 
 					range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
 				}
