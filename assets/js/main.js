@@ -469,7 +469,7 @@ class Asteroid {
 				let ship = {
 					type: 'ship',
 					immat: newshipimmat,
-					dstep: 45, // rotation steps for changedir()
+					dstep: 15, // rotation steps for changedir()
 					d: 0,
 					speed: 1,
 					speedrange: { min: -2, max: 20 },
@@ -480,7 +480,7 @@ class Asteroid {
 					h: 16,
 					l: 8, // 3d
 					tetha: 0,
-					delayshoot: { current: 0, max: 50 }, //render refresh need between shoot
+					delayshoot: { current: 0, max: 70 }, //render refresh need between shoot
 					div: Object,
 					mods: {
 						limit: 0,
