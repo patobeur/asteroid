@@ -8,6 +8,6 @@ positions detection
 
 collisions
 
-add a splice in array !! (seem not to work some time !!!)
+array.push() and array.splice testes !! (seem not to work some time !!!)
 
 🚀 Tast'it [Asteroid](https://patobeur.github.io/asteroid/).
