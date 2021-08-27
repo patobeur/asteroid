@@ -53,51 +53,12 @@ class Asteroid {
 	}
 	render = () => {
 		if (!this.Pause) {
-
 			// PROJECTILS
-			this.projectils.projectils.forEach(projectil => {
-				if (projectil.lifedelay.current <= projectil.lifedelay.max) {
-					this.projectils.update_DivPos(projectil)
-					projectil.lifedelay.current += 1
-				}
-				else {
-					projectil.div.remove()
-					// console.log(projectil.lifedelay.current, '/', projectil.lifedelay.max)
-					// to do remove this from array
-					// without breaking the music ,(
-					// need friends
-				}
-			});
-
+			this.projectils.renderProjectils()
 			// ASTEROIDS
-			if (this.asteroids.asteroids[0]) {
-				this.asteroids.asteroids.forEach(asteroid => {
-					this.asteroids.update_DivPos(asteroid)
-				})
-
-			}
-
+			this.asteroids.renderAsteroids()
 			// PLAYERS
-			if (this.players.players[0]) {
-				this.players.players.forEach(player => {
-					if (player.ships.ships[player.currentship]) {
-						// player.ships.ships.forEach(ship => {
-						if (player.ships.ships[player.currentship].mods) {
-							player.checkdir(player)
-							this.check_PlayerMoves(player)
-							this.check_ShipPos(player)
-							this.update_ShipDivPos(player)
-							this.players.refreshconsole(player)
-						}
-						else {
-							this.setBugAndPause('no ships define')
-						}
-						// });
-					}
-					else this.setBugAndPause('no ships mods define')
-				});
-			}
-			else this.setBugAndPause('no player define')
+			this.players.renderPlayer()
 		}
 	}
 	check_PlayerMoves = (player) => {
@@ -260,18 +221,40 @@ class Asteroid {
 								console.log('empty changedir()')
 								break
 						}
-					}
+					},
 				}
 				this.players.players.push(newplayer)
 				this.players.players[immat].ships.addship(this.players.players[immat])
 			},
+			renderPlayer: () => {
+				if (this.players.players[0]) {
+					this.players.players.forEach(player => {
+						if (player.ships.ships[player.currentship]) {
+							// player.ships.ships.forEach(ship => {
+							if (player.ships.ships[player.currentship].mods) {
+								player.checkdir(player)
+								this.check_PlayerMoves(player)
+								this.check_ShipPos(player)
+								this.update_ShipDivPos(player)
+								this.players.refreshconsole(player)
+							}
+							else {
+								this.setBugAndPause('no ships define')
+							}
+							// });
+						}
+						else this.setBugAndPause('no ships mods define')
+					});
+				}
+				else this.setBugAndPause('no player define')
+			}
 		}
 		return datas
 	}
 	asteroidsManager = () => {
 		let data = {
 			asteroids: [],
-			max: 4,
+			max: 5,
 			speeds: { 0: 5 },
 			create: (e) => {
 				for (let i = 0; i < this.asteroids.max; i++) {
@@ -321,6 +304,14 @@ class Asteroid {
 				if (asteroid.x < (0 - (asteroid.w / 2))) { asteroid.x = this.screen.w - 1 }
 				if (asteroid.y < (0 - (asteroid.h / 2))) { asteroid.y = this.screen.h - 1 }
 				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
+			},
+			renderAsteroids: (asteroid) => {
+				if (this.asteroids.asteroids[0]) {
+					this.asteroids.asteroids.forEach(asteroid => {
+						this.asteroids.update_DivPos(asteroid)
+						this.check_collisions(asteroid)
+					})
+				}
 			}
 		}
 		return data
@@ -329,6 +320,7 @@ class Asteroid {
 	projectilsManager = () => {
 		let data = {
 			projectils: [],
+			projectilstodelete: [],
 			speeds: { icecube: 5 },
 			add: (projectil, player) => {
 				projectil.div = this.divmaker(projectil.type, projectil, player)
@@ -346,11 +338,11 @@ class Asteroid {
 					immat: immat,
 					playerimmat: player.immat,
 					d: ship.d,
-					speed: ship.speed > 0 ? ship.speed + (50 - ship.speed) : 50,
+					speed: ship.speed > 0 ? ship.speed + (20 - ship.speed) : 20,
 					x: ship.x,// + (ship.w / 2),
 					y: ship.y,// + (ship.h / 2),
 					z: ship.z,// + (ship.l / 2), // 3d
-					lifedelay: { current: 0, max: 70 },
+					lifedelay: { current: 0, max: 20 },
 					w: 5,
 					h: 5,
 					l: 5, // 3d
@@ -369,6 +361,34 @@ class Asteroid {
 				projectil.div.style.top = ((projectil.y - (projectil.h / 2))) + 'px'
 				projectil.div.style.zIndex = parseInt((projectil.z - (projectil.l / 2))) // dreamming to make this 3d
 				projectil.div.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
+			},
+			addToDeletation: (projectil) => {
+				projectil.div.remove()
+				this.projectils.projectilstodelete.push(projectil)
+			},
+			DeleteProjectils: (projectil) => {
+				// delete projectil
+				if (this.projectils.projectilstodelete.length > 0) {
+					this.projectils.projectilstodelete.forEach(projectil => {
+						this.projectils.projectils.splice(projectil, 1);
+					})
+					this.projectils.projectilstodelete = []
+				}
+			},
+			renderProjectils: () => {
+				if (this.projectils.projectils.length > 0) {
+					this.projectils.projectils.forEach(projectil => {
+						if (projectil.lifedelay.current <= projectil.lifedelay.max) {
+							this.projectils.update_DivPos(projectil)
+							projectil.lifedelay.current += 1
+						}
+						else {
+							this.projectils.addToDeletation(projectil)
+						}
+					});
+					// delete projectil
+					this.projectils.DeleteProjectils()
+				}
 			}
 		}
 		return data;
@@ -668,13 +688,6 @@ class Asteroid {
 	aleaEntreBornes(minimum, maximum) {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 	}
-	get_distance = (player, star) => { // get hypotenus with pythaGore
-		let ship = player.ships.ships[player.currentship]
-		let AB = (ship.x + (ship.w / 2)) - (star.x + (star.w / 2))
-		let AC = (ship.y + (ship.h / 2)) - (star.y + (star.h / 2))
-		let distance = Math.sqrt((AB * AB) + (AC * AC))
-		return distance
-	}
 	setPause() {
 		this.Pause = !this.Pause
 	}
@@ -686,6 +699,52 @@ class Asteroid {
 			if (string) { console.log(string) }
 		}
 
+	}
+
+	get_distance = (a, b) => { // get hypotenus with pythaGore
+		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
+		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
+		return Math.sqrt((AB * AB) + (AC * AC))
+	}
+	check_collisions = (asteroid) => {
+		let alertedistancebeforedie = 30
+		// CHECK COLLiSION with projectils
+		if (this.projectils.projectils[0]) {
+			this.projectils.projectils.forEach(projectil => {
+				let distance = this.get_distance(asteroid, projectil);
+				if (!projectil.unarmed) {
+					if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
+						this.projectils.addToDeletation(projectil)
+						console.log('boom: ' + asteroid.immat)
+						asteroid.unarmed = true
+						asteroid.div.style.backgroundColor = "red"
+						asteroid.div.classList.add('unarmed')
+						asteroid.div.textContent = "BOOM"
+					}
+				}
+				//console.log(distance)
+			})
+		}
+		// this.MF[typeobj].forEach(objB => {
+		// 	if (objB.immat != obj.immat) {
+		// 		let distance = this.get_distance(obj, objB);
+		// 		// die alert range test only for player right now
+		// 		if (obj.objtype === 'player') {
+		// 			// self range test (explode condition here)
+		// 			(distance < ((obj.sizwhl.w / 2) + (objB.sizwhl.w / 2)))
+		// 				? obj.collide.collideself = true
+		// 				: '';
+		// 		}
+		// 		((distance - alertedistancebeforedie) < ((obj.sizwhl.w / 2) + (objB.sizwhl.w / 2)))
+		// 			? obj.collide.collidealert = true
+		// 			: '';
+		// 		// rangea test
+		// 		(distance < ((obj.sizwhl.w * 2) + (objB.sizwhl.w)))
+		// 			? obj.collide.colliderangea = true
+		// 			: '';
+		// 		this.check_collisionsDirectives(obj, objB)
+		// 	}
+		// });
 	}
 }
 let isLoaded = () => {
