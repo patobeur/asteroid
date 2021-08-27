@@ -27,6 +27,9 @@ class Asteroid {
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
 		stringcss += '#devmire {position: absolute;background-image: url("assets/img/center_testing_visual_white.svg");background-attachment: fixed;background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.ship.visual {background-image: url(assets/img/ship.svg);background-position: center center;background-size: cover;background-repeat:no-repeat}'
+		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("/assets/img/asteroid_1.svg");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("/assets/img/asteroid_2.svg");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("/assets/img/asteroid_3.svg");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		this.addCss(stringcss, 'main')
 	}
 	addCss(stringcss, styleid) {
@@ -43,11 +46,15 @@ class Asteroid {
 		this.players.create()
 		this.players.players[this.actualplayer].ships.addtodom()
 
+		this.asteroids.create()
+
 		setInterval(() => { this.render() }, 100);
 		this.addeventkey()
 	}
 	render = () => {
 		if (!this.Pause) {
+
+			// PROJECTILS
 			this.projectils.projectils.forEach(projectil => {
 				if (projectil.lifedelay.current <= projectil.lifedelay.max) {
 					this.projectils.update_DivPos(projectil)
@@ -61,6 +68,16 @@ class Asteroid {
 					// need friends
 				}
 			});
+
+			// ASTEROIDS
+			if (this.asteroids.asteroids[0]) {
+				this.asteroids.asteroids.forEach(asteroid => {
+					this.asteroids.update_DivPos(asteroid)
+				})
+
+			}
+
+			// PLAYERS
 			if (this.players.players[0]) {
 				this.players.players.forEach(player => {
 					if (player.ships.ships[player.currentship]) {
@@ -195,6 +212,9 @@ class Asteroid {
 					document.getElementById('limit').textContent = 'limit:' + ship.mods.limit + "/" +
 						ship.mods.limits[ship.mods.limit]
 					document.getElementById('dir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
+
+
+					document.getElementById('asteroids').textContent = 'asteroids:' + this.asteroids.lenght
 				}
 			},
 			create: () => {
@@ -251,22 +271,57 @@ class Asteroid {
 	asteroidsManager = () => {
 		let data = {
 			asteroids: [],
-			// create: (size) => {
-			// 	let immat = this.asteroids.asteroids.length
-			// 	let asteroid = {
-			// 		immat: immat,
-			// 		speed: 10,
-			// 		x: ship.x,// - ( ship.w/2),
-			// 		y: ship.y,// - ( ship.h/2),
-			// 		z: ship.z,// - ( ship.l/2), // 3d
-			// 		w: 5,
-			// 		h: 12,
-			// 		l: 5, // 3d
-			// 		orbitdelay: [0, 50], // current,orbit refreh delay 
-			// 		range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
-			// 	}
-			// 	this.asteroids.add(asteroid)
-			// },
+			max: 4,
+			speeds: { 0: 5 },
+			create: (e) => {
+				for (let i = 0; i < this.asteroids.max; i++) {
+					let immat = this.asteroids.asteroids.length
+					let asteroid = {
+						immat: immat,
+						speed: 3,
+						type: 'asteroid',
+						x: 32,// - ( ship.w/2),
+						y: 32,// - ( ship.h/2),
+						z: 32,// - ( ship.l/2), // 3d
+						w: 32,
+						h: 32,
+						l: 32, // 3d
+						d: this.aleaEntreBornes(1, 360),
+						pts: 100,
+						lv: 1,
+						div: Object
+					}
+					this.asteroids.addtostack(asteroid)
+				}
+			},
+			addtostack: (asteroid) => {
+				asteroid.div = this.divmaker(asteroid.type, asteroid, false)
+				this.asteroids.asteroids.push(asteroid)
+				// this.asteroids.update_DivPos(asteroid)
+				this.asteroids.addtodom(asteroid)
+				// 	this.asteroids.add(asteroid)
+			},
+			addtodom: (asteroid) => {
+				document.body.appendChild(asteroid.div)
+			},
+			update_DivPos: (asteroid) => {
+				this.asteroids.check_ElementPos(asteroid)
+				asteroid.x = asteroid.x + (asteroid.speed * Math.cos((asteroid.d) * (Math.PI / 180)))
+				asteroid.y = asteroid.y + (asteroid.speed * Math.sin((asteroid.d) * (Math.PI / 180)))
+				// div refresh attributes
+				asteroid.div.style.left = parseInt((asteroid.x - (asteroid.w / 2))) + 'px'
+				asteroid.div.style.top = parseInt((asteroid.y - (asteroid.h / 2))) + 'px'
+				asteroid.div.style.zIndex = parseInt((asteroid.z - (asteroid.l / 2))) // dreamming to make this 3d
+				asteroid.div.style.transform = 'rotate(' + (asteroid.d + 90) + 'deg)'
+			},
+			check_ElementPos: (asteroid) => { // check out screen position
+				if (asteroid.x > (this.screen.w + (asteroid.w / 2))) { asteroid.x = 1 }
+				if (asteroid.y > (this.screen.h + (asteroid.h / 2))) { asteroid.y = 1 }
+				if (asteroid.z > (this.screen.l + (asteroid.l / 2))) { asteroid.z = 1 } // 3d
+				if (asteroid.x < (0 - (asteroid.w / 2))) { asteroid.x = this.screen.w - 1 }
+				if (asteroid.y < (0 - (asteroid.h / 2))) { asteroid.y = this.screen.h - 1 }
+				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
+			}
 		}
 		return data
 
@@ -276,26 +331,6 @@ class Asteroid {
 			projectils: [],
 			speeds: { icecube: 5 },
 			add: (projectil, player) => {
-				// console.log('projectil added to list')
-				// console.log(projectil)
-				// let ddnewprojectil = {
-				// 	playerimmat: projectil.playerimmat ?? false,
-				// 	immat: projectil.immat ?? 0,
-				// 	type: projectil.type ?? 'icecube',
-				// 	d: projectil.d ?? 270,
-				// 	speed: this.projectils.speeds[projectil.type] ?? 1,
-				// 	x: projectil.x ?? 0,
-				// 	y: projectil.y ?? 0,
-				// 	z: projectil.z ?? 0, // 3d
-				// 	w: projectil.w ?? 0,
-				// 	h: projectil.h ?? 0,
-				// 	l: projectil.l ?? 0, // 3d
-				// 	lifedelay: projectil.lifedelay ?? { current: 0, max: 20 },
-				// 	visual: projectil.visual ?? '|',
-				// 	orbitdelay: [0, 50], // current,orbit refreh delay 
-				// 	range: projectil.range ?? { x: 10, y: 10, z: 10 }, // range of orbit effect in pixels
-				// 	div: Object
-				// }
 				projectil.div = this.divmaker(projectil.type, projectil, player)
 				this.projectils.projectils.push(projectil)
 				this.projectils.update_DivPos(projectil)
@@ -334,7 +369,6 @@ class Asteroid {
 				projectil.div.style.top = ((projectil.y - (projectil.h / 2))) + 'px'
 				projectil.div.style.zIndex = parseInt((projectil.z - (projectil.l / 2))) // dreamming to make this 3d
 				projectil.div.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
-
 			}
 		}
 		return data;
@@ -426,6 +460,45 @@ class Asteroid {
 		// type Player || Asteroid
 		let obj = document.createElement("div")
 		obj.className = type
+		if (type === 'asteroid') {
+			obj.className = type + '  type-' + item.lv
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			// obj.style.backgroundColor = 'rgba(255, 0, 0, 1)'
+			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			visual.style.position = 'absolute'
+			visual.style.width = '8px'
+			visual.style.height = '16px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let range = document.createElement('div')
+			range.style.position = 'absolute'
+			range.className = type + ' range'
+			range.style.width = '60px' // 3*3rem
+			range.style.height = '60px' // 3*3rem
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
 		if (type === 'ship') {
 			obj.style.position = 'absolute'
 			obj.style.width = item.w + 'px'
@@ -571,7 +644,7 @@ class Asteroid {
 		}, true)
 
 	}
-	check_ShipPos = (player) => {
+	check_ShipPos = (player) => { // check out screen position
 		let ship = player.ships.ships[player.currentship]
 		if (ship.mods.moves[ship.mods.move] != 'orbit') {
 			if (ship.x > (this.screen.w + (ship.w / 2))) { ship.x = 1 }
@@ -591,6 +664,9 @@ class Asteroid {
 		// html/css = 0deg for north
 		// and js math = -90 for north WTF ?? 
 		ship.div.style.transform = 'rotate(' + (ship.d + 90) + 'deg)'
+	}
+	aleaEntreBornes(minimum, maximum) {
+		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 	}
 	get_distance = (player, star) => { // get hypotenus with pythaGore
 		let ship = player.ships.ships[player.currentship]
