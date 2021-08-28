@@ -215,13 +215,13 @@ class Asteroid {
 				if (ship.mods.move === 0) { // normal move mods
 					// to do
 					// console.log(d)
-					ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
-					ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
+					ship.x = parseInt((ship.x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
+					ship.y = parseInt((ship.y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
 				}
 				else if (ship.mods.move === 1) { // nogravity ??
 					// to do
-					ship.x = ship.x + (speed * Math.cos((d) * (Math.PI / 180)))
-					ship.y = ship.y + (speed * Math.sin((d) * (Math.PI / 180)))
+					ship.x = parseInt((ship.x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
+					ship.y = parseInt((ship.y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
 				}
 				else if (ship.mods.move === 2) { // ia
 					// to do
@@ -270,6 +270,7 @@ class Asteroid {
 	asteroidsManager = () => {
 		let data = {
 			asteroids: [],
+			asteroidstodelete: [],
 			max: 8,
 			speeds: { 0: 5 },
 			create: (e) => {
@@ -320,23 +321,32 @@ class Asteroid {
 				if (asteroid.y < (0 - (asteroid.h / 2))) { asteroid.y = this.screen.h - 1 }
 				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
 			},
-			renderAsteroids: (asteroid) => {
-				if (this.asteroids.asteroids[0] && !this.isPause) {
-					this.asteroids.asteroids.forEach(asteroid => {
-						this.asteroids.update_DivPos(asteroid)
-						this.asteroids.check_collisions(asteroid)
-					})
-				}
+			addtoscore: (projectil) => {
+
 			},
 			check_collisions: (asteroid) => {
 				// 💡 an idea to make it better !!!!
 				// collision is true if distance from objects centers is less than both half width's objects summed
+
+				// CHECK COLLiSION with player ship		
+				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
+				let distance = this.getDistance(asteroid, ship);
 				let alertedistancebeforecolliding = 30
+				if (!asteroid.unarmed) {
+					if (distance < ((ship.w / 2) + (asteroid.w / 2))) {
+						// this.projectils.addToDeletation(projectil)
+						asteroid.unarmed = true
+						asteroid.div.classList.add('unarmed')
+						asteroid.div.textContent = "BOOM"
+						ship.div.classList.add('unarmed')
+					}
+				}
+
 				// CHECK COLLiSION with projectils
-				if (this.projectils.projectils[0]) {
-					this.projectils.projectils.forEach(projectil => {
-						let distance = this.getDistance(asteroid, projectil);
-						if (!asteroid.unarmed) {
+				if (!asteroid.unarmed) {
+					if (this.projectils.projectils[0]) {
+						this.projectils.projectils.forEach(projectil => {
+							let distance = this.getDistance(asteroid, projectil);
 							if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
 								this.projectils.addToDeletation(projectil)
 								asteroid.unarmed = true
@@ -345,23 +355,35 @@ class Asteroid {
 								// to do
 								// delete asteroids from array
 
-								// this.asteroids.addToDeletation(asteroid)
 							}
-						}
-					})
-				}
-				// CHECK COLLiSION with player ship
-				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
-				let distance = this.getDistance(asteroid, ship);
-				if (!asteroid.unarmed) {
-					if (distance < ((ship.w / 2) + (asteroid.w / 2))) {
-						// this.projectils.addToDeletation(projectil)
-						asteroid.unarmed = true
-						asteroid.div.classList.add('unarmed')
-						asteroid.div.textContent = "BOOM"
+							if (this.asteroids.asteroidstodelete.length > 0) {
+								this.asteroids.DeleteAsteroids(asteroid)
+							}
+						})
 					}
 				}
-			}
+			},
+			addToDeletation: (asteroid) => {
+				asteroid.div.remove()
+				this.asteroids.asteroidstodelete.push(asteroid)
+			},
+			DeleteAsteroids: (asteroid) => {
+				// delete projectil
+				if (this.asteroids.asteroidstodelete.length > 0) {
+					this.asteroids.asteroidstodelete.forEach(asteroid => {
+						this.asteroids.asteroids.splice(asteroid, 1);
+					})
+					this.asteroids.asteroidstodelete = []
+				}
+			},
+			renderAsteroids: (asteroid) => {
+				if (this.asteroids.asteroids[0] && !this.isPause) {
+					this.asteroids.asteroids.forEach(asteroid => {
+						this.asteroids.update_DivPos(asteroid)
+						this.asteroids.check_collisions(asteroid)
+					})
+				}
+			},
 		}
 		return data
 	}
@@ -734,22 +756,23 @@ class Asteroid {
 		return {
 			refreshconsole: (player) => { // dev tools only // remove this if on prod
 				let ship = player.ships.ships[player.currentship]
+				let nbAsteroids = this.asteroids.asteroids.length
+				let nbProjectils = this.projectils.projectils.length
 				if (document.getElementById('devconsole')) {
-					document.getElementById('playerimmat').textContent = 'playerimmat:' + this.actualPlayer//player.immat
-					document.getElementById('x').textContent = 'x:' + ship.x
-					document.getElementById('y').textContent = 'y:' + ship.y
-					document.getElementById('z').textContent = 'z:' + ship.z
-					document.getElementById('d').textContent = 'd:' + ship.d
-					document.getElementById('speed').textContent = 'speed:' + ship.speed
-					document.getElementById('move').textContent = 'move:' + ship.mods.move + "/" +
-						ship.mods.moves[ship.mods.move]
-					document.getElementById('limit').textContent = 'limit:' + ship.mods.limit + "/" +
-						ship.mods.limits[ship.mods.limit]
-					document.getElementById('dir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
-					document.getElementById('asteroids').textContent = 'asteroids:' + this.asteroids.lenght
-					document.getElementById('visualhelp').textContent = '[v] Visual Help ?? (' + (this.isVisualHelp ? 'On' : 'Off') + ')'
-
-
+					document.getElementById('devplayerimmat').textContent = 'playerimmat:' + this.actualPlayer//player.immat
+					document.getElementById('devx').textContent = 'x:' + ship.x
+					document.getElementById('devy').textContent = 'y:' + ship.y
+					document.getElementById('devz').textContent = 'z:' + ship.z
+					document.getElementById('devd').textContent = 'd:' + ship.d
+					document.getElementById('devspeed').textContent = 'speed:' + ship.speed
+					document.getElementById('devmove').textContent = 'move:' + ship.mods.move + " [" +
+						ship.mods.moves[ship.mods.move] + ']'
+					document.getElementById('devlimit').textContent = 'limit:' + ship.mods.limit + " [" +
+						ship.mods.limits[ship.mods.limit] + ']'
+					document.getElementById('devdir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
+					document.getElementById('devasteroids').textContent = 'asteroids[]:' + nbAsteroids
+					document.getElementById('devprojectils').textContent = 'projectils[]:' + nbProjectils
+					document.getElementById('devvisualhelp').textContent = '[v] Visual Help ?? [' + (this.isVisualHelp ? 'On' : 'Off') + ']'
 				}
 			},
 			setBugAndPause: (string = false) => {
