@@ -1,20 +1,24 @@
 "use strict";
 class Asteroid {
 	constructor() {
-		this.Pause = false;
-		this.Bug = false;
-		this.actualplayer = 0;
+		this.isPause = false;
+		this.isBug = false;
+		this.isNextPlayer = false;
+		this.isVisualHelp = false;
+		this.renderInterval = 100
+		this.actualPlayer = 0;
+		this.maxPlayer = 2;
+		// -- 
 		this.center = { x: (window.innerWidth / 2), y: (window.innerHeight / 2), z: 0 }
 		this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
 		// this.screenRatio = {w:1,h:1,l:1}
 		// this.cosmos = this.cosmosManager()
+		this.devTools = this.getDevTools() // dev tools
+		// --
 		this.players = this.playersManager()
-		this.stars = this.starsManager()
+		this.stars = this.starsManager() // not really needed
 		this.projectils = this.projectilsManager()
 		this.asteroids = this.asteroidsManager()
-		this.proj = () => {
-			return this.projectils.length
-		}
 		this.createAndAddCss()
 		this.startGame()
 	}
@@ -24,9 +28,14 @@ class Asteroid {
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
 		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-attachment: fixed;background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
+		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
+		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
 		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
+		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
+
 		this.addCss(stringcss, 'main')
 	}
 	addCss(stringcss, styleid) {
@@ -36,20 +45,27 @@ class Asteroid {
 		document.getElementsByTagName('head')[0].appendChild(style);
 	}
 	startGame = () => {
+		//cosomos
 		// this.cosmos.addtodom()
-		this.stars.create()
-		this.stars.add()
 
+		// STARS ?? REALY NOT NEEDED
+		if (this.stars) {
+			this.stars.create()
+			this.stars.add()
+		}
+
+		// PLAYERS
 		this.players.create()
-		this.players.players[this.actualplayer].ships.addtodom()
-
+		this.players.players[this.actualPlayer].ships.addtodom()
+		// ASTEROIDS
 		this.asteroids.create()
 
-		setInterval(() => { this.render() }, 100);
+		//RENDER 
+		setInterval(() => { this.render() }, this.renderInterval);
 		this.addEventKey()
 	}
 	render = () => {
-		if (!this.Pause) {
+		if (!this.isPause) {
 			// PROJECTILS
 			this.projectils.renderProjectils()
 			// ASTEROIDS
@@ -93,35 +109,17 @@ class Asteroid {
 	playersManager = () => {
 		let datas = {
 			players: [],
-			refreshconsole: (player) => { // dev tools only // remove this if on prod
-				let ship = player.ships.ships[player.currentship]
-				if (document.getElementById('devconsole')) {
-					document.getElementById('playerimmat').textContent = 'playerimmat:' + this.actualplayer//player.immat
-					document.getElementById('x').textContent = 'x:' + ship.x
-					document.getElementById('y').textContent = 'y:' + ship.y
-					document.getElementById('z').textContent = 'z:' + ship.z
-					document.getElementById('d').textContent = 'd:' + ship.d
-					document.getElementById('speed').textContent = 'speed:' + ship.speed
-					document.getElementById('move').textContent = 'move:' + ship.mods.move + "/" +
-						ship.mods.moves[ship.mods.move]
-					document.getElementById('limit').textContent = 'limit:' + ship.mods.limit + "/" +
-						ship.mods.limits[ship.mods.limit]
-					document.getElementById('dir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
-
-
-					document.getElementById('asteroids').textContent = 'asteroids:' + this.asteroids.lenght
-				}
-			},
 			create: () => {
 				let immat = this.players.players.lenght ?? 0
 				let newplayer = {
 					immat: immat,
 					score: 0,
 					lifetime: 0,
+					gameover: 0,
 					lives: 3,
 					dir: { right: 0, left: 0, up: 0, down: 0 }, // right, left (arrows keys downned)
 					type: 'ship',
-					ships: this.shipManager('ship'),
+					ships: this.shipsManager('ship'),
 					currentship: 0,
 					resetdir: (player) => {
 						player.dir = { right: 0, left: 0 }
@@ -137,7 +135,7 @@ class Asteroid {
 						player.resetdir(player)
 					},
 					changedir: (dir, datas) => {
-						let player = this.players.players[this.actualplayer]
+						let player = this.players.players[this.actualPlayer]
 						switch (dir) {
 							case 'ArrowRight':
 								player.dir.right = 1
@@ -170,17 +168,17 @@ class Asteroid {
 								this.players.check_PlayerMoves(player)
 								this.players.check_ShipPos(player)
 								this.players.update_ShipDivPos(player)
-								this.players.refreshconsole(player)
+								this.devTools.refreshconsole(player)
 							}
 							else {
-								this.setBugAndPause('no ships define')
+								this.devTools.setBugAndPause('no ships define')
 							}
 							// });
 						}
-						else this.setBugAndPause('no ships mods define')
+						else this.devTools.setBugAndPause('no ships mods define')
 					});
 				}
-				else this.setBugAndPause('no player define')
+				else this.devTools.setBugAndPause('no player define')
 			},
 			check_ShipPos: (player) => { // check out screen position
 				let ship = player.ships.ships[player.currentship]
@@ -204,9 +202,8 @@ class Asteroid {
 				ship.div.style.transform = 'rotate(' + (ship.d + 90) + 'deg)'
 			},
 			check_PlayerMoves: (player) => {
-				let star = this.stars.stars[0]
 				let ship = player.ships.ships[player.currentship]
-				// let distance = this.get_distance(player,star)
+				// let distance = this.getDistance(player,star)
 				let x = ship.x
 				let y = ship.y
 				let z = ship.z // 3d
@@ -229,7 +226,8 @@ class Asteroid {
 				else if (ship.mods.move === 2) { // ia
 					// to do
 				}
-				else if (ship.mods.move === 3) { // orbit
+				else if (ship.mods.move === 3 && this.stars) { // orbit
+					let star = this.stars.stars[0]
 					// star center pos
 					let starx = star.x + (star.w / 2)
 					let stary = star.y + (star.h / 2)
@@ -239,7 +237,7 @@ class Asteroid {
 					// new pos
 					let x2 = 0
 					let y2 = 0
-					let distance = this.get_distance(player, star)
+					let distance = this.getDistance(player, star)
 					if (distance > 0) { // need modification
 						x2 = starx + Math.round((distance) * (Math.cos(ship.d * (180 / Math.PI))));
 						y2 = stary + Math.round((distance) * (Math.sin(ship.d * (180 / Math.PI))));
@@ -323,7 +321,7 @@ class Asteroid {
 				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
 			},
 			renderAsteroids: (asteroid) => {
-				if (this.asteroids.asteroids[0]) {
+				if (this.asteroids.asteroids[0] && !this.isPause) {
 					this.asteroids.asteroids.forEach(asteroid => {
 						this.asteroids.update_DivPos(asteroid)
 						this.asteroids.check_collisions(asteroid)
@@ -331,31 +329,34 @@ class Asteroid {
 				}
 			},
 			check_collisions: (asteroid) => {
-				let alertedistancebeforedie = 30
+				// 💡 an idea to make it better !!!!
+				// collision is true if distance from objects centers is less than both half width's objects summed
+				let alertedistancebeforecolliding = 30
 				// CHECK COLLiSION with projectils
 				if (this.projectils.projectils[0]) {
 					this.projectils.projectils.forEach(projectil => {
-						let distance = this.get_distance(asteroid, projectil);
+						let distance = this.getDistance(asteroid, projectil);
 						if (!asteroid.unarmed) {
 							if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
 								this.projectils.addToDeletation(projectil)
 								asteroid.unarmed = true
-								asteroid.div.style.backgroundColor = "black"
 								asteroid.div.classList.add('unarmed')
 								asteroid.div.textContent = "BOOM"
+								// to do
+								// delete asteroids from array
+
+								// this.asteroids.addToDeletation(asteroid)
 							}
 						}
 					})
 				}
-				// CHECK COLLiSION with player
-				let ship = this.players.players[this.actualplayer].ships.ships[this.players.players[this.actualplayer].currentship]
-
-				let distance = this.get_distance(asteroid, ship);
+				// CHECK COLLiSION with player ship
+				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
+				let distance = this.getDistance(asteroid, ship);
 				if (!asteroid.unarmed) {
 					if (distance < ((ship.w / 2) + (asteroid.w / 2))) {
 						// this.projectils.addToDeletation(projectil)
 						asteroid.unarmed = true
-						asteroid.div.style.backgroundColor = "red"
 						asteroid.div.classList.add('unarmed')
 						asteroid.div.textContent = "BOOM"
 					}
@@ -440,7 +441,7 @@ class Asteroid {
 		}
 		return data;
 	}
-	shipManager(type = false) {
+	shipsManager(type = false) {
 		let data = {
 			ships: [],
 			type: type ?? 'ship',
@@ -448,13 +449,13 @@ class Asteroid {
 				player.ships.ships.push(player.ships.getnewship(player))
 			},
 			addtodom: () => {
-				// this.players.players[this.actualplayer].ship.div.textContent = this.players.players[this.actualplayer].ship.visual
-				let player = this.players.players[this.actualplayer]
+				// this.players.players[this.actualPlayer].ship.div.textContent = this.players.players[this.actualPlayer].ship.visual
+				let player = this.players.players[this.actualPlayer]
 				let ship = player.ships.ships[player.currentship]
 				document.body.appendChild(ship.div)
 			},
 			changespeed: (dir) => {
-				let player = this.players.players[this.actualplayer]
+				let player = this.players.players[this.actualPlayer]
 				let ship = player.ships.ships[player.currentship]
 				switch (dir) {
 					case 'ArrowUp':
@@ -469,7 +470,7 @@ class Asteroid {
 				}
 			},
 			shoot: (type) => {
-				let player = this.players.players[this.actualplayer]
+				let player = this.players.players[this.actualPlayer]
 				// let ship = player.ships.ships[player.currentship]
 				this.projectils.create(type, player)
 			},
@@ -499,7 +500,7 @@ class Asteroid {
 						move: 0,
 						moves: ['nogravity', 'polar', 'ia', 'orbit', 'normal'],
 						next: (modename) => { // l
-							let player = this.players.players[this.actualplayer]
+							let player = this.players.players[this.actualPlayer]
 							let ship = player.ships.ships[player.currentship]
 							ship.mods[modename] =
 								ship.mods[modename] < ship.mods[modename + 's'].length - 1
@@ -508,7 +509,7 @@ class Asteroid {
 							// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
 						},
 						preview: (modename) => { // o key
-							let player = this.players.players[this.actualplayer]
+							let player = this.players.players[this.actualPlayer]
 							let ship = player.ships.ships[player.currentship]
 							ship.mods[modename] =
 								ship.mods[modename] > 0
@@ -528,10 +529,11 @@ class Asteroid {
 		document.onkeydown = (eventkeydown) => {
 			// console.log(eventkeydown.key)
 
-			let player = this.players.players[this.actualplayer]
+			let player = this.players.players[this.actualPlayer]
 			let ship = player.ships.ships[player.currentship]
 
 			if (eventkeydown.key === "p") { this.setPause() }
+			if (eventkeydown.key === "v") { this.setVisualHelp() }
 			if (eventkeydown.key === "n") { ship.mods.next('move') }
 			if (eventkeydown.key === "j") { ship.mods.preview('move') }
 			if (eventkeydown.key === "l") { ship.mods.next('limit') } // 3d
@@ -558,18 +560,21 @@ class Asteroid {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
 	}
 	setPause() {
-		this.Pause = !this.Pause
+		this.isPause = !this.isPause
 	}
-	setBugAndPause(string = false) {
-		this.Bug = true
-		this.Pause = true
-		if (this.Bug && this.Pause) {
-			console.log('bug ! game paused')
-			if (string) { console.log(string) }
+	setVisualHelp() {
+		this.isVisualHelp = !this.isVisualHelp
+		if (this.isVisualHelp) {
+			let visual = '.ship.range {border: 1px dotted rgba(0, 255, 0, .9);}'
+			visual += '.asteroid.range {border: 1px dotted rgba(255, 0, 0, .9);}'
+			visual += '.projectil.range {background-color:rgba(0, 255, 0, .5);;border: 1px dotted rgba(0, 255, 0, .9);}'
+			this.addCss(visual, 'visual')
 		}
-
+		else {
+			document.getElementById('visual').remove()
+		}
 	}
-	get_distance = (a, b) => { // get hypotenus with pythaGore
+	getDistance = (a, b) => { // get hypotenus with pythaGore
 		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
 		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
 		return Math.sqrt((AB * AB) + (AC * AC))
@@ -591,8 +596,42 @@ class Asteroid {
 			obj.style.left = item.x + 'px'
 			obj.style.top = item.y + 'px'
 			obj.style.borderRadius = '50%'
-			// obj.style.backgroundColor = 'rgba(255, 0, 0, 1)'
-			obj.style.border = '3px dotted rgba(255,0, 0, .5)'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+			visual.style.borderRadius = '50%'
+
+			let range = document.createElement('div')
+			range.className = type + ' range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		if (type === 'ship') {
+			obj.style.position = 'absolute'
+			obj.className = type
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
 
 			let visual = document.createElement('div')
 			visual.className = type + ' visual'
@@ -612,50 +651,12 @@ class Asteroid {
 			range.style.display = 'flex'
 			range.style.justifyContent = 'center'
 			range.style.alignItems = 'start'
-			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
-			range.style.border = '1px dotted rgba(255,255, 255, 1)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		if (type === 'ship') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			// obj.style.backgroundColor = 'rgba(0, 0, 0, 1)'
-			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
 
-			let visual = document.createElement('div')
-			visual.className = 'ship visual'
-			visual.style.position = 'absolute'
-			visual.style.width = item.w + 'px'
-			visual.style.height = item.h + 'px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
-
-			let range = document.createElement('div')
-			range.style.position = 'absolute'
-			range.className = 'ship range'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-			// range.style.backgroundColor = 'rgba(0, 255, 255, 0.234)'
-			range.style.border = '1px dotted rgba(0,255, 0, 1)'
 			obj.appendChild(range)
 			obj.appendChild(visual)
 		}
 		else if (type === 'icecube') {
+			obj.className = 'projectil ' + type
 			obj.style.position = 'absolute'
 			obj.style.width = item.w + 'px'
 			obj.style.height = item.h + 'px'
@@ -667,20 +668,19 @@ class Asteroid {
 			obj.style.alignItems = 'center'
 			obj.style.color = 'white'
 			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
-			// obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
 
 			let visual = document.createElement('div')
-			// visual.className='visual'
+			visual.className = 'projectil visual'
+			visual.textContent = item.visual
 			visual.style.position = 'absolute'
 			visual.style.width = item.w + 'px'
 			visual.style.height = item.h + 'px'
-			visual.textContent = item.visual
 			visual.style.display = 'flex'
 			visual.style.justifyContent = 'center'
 			visual.style.alignItems = 'center'
 
 			let range = document.createElement('div')
-			range.className = type + ' range'
+			range.className = 'projectil range'
 			range.style.position = 'absolute'
 			range.style.width = item.range.x + 'px'
 			range.style.height = item.range.y + 'px'
@@ -688,8 +688,31 @@ class Asteroid {
 			range.style.display = 'flex'
 			range.style.justifyContent = 'center'
 			range.style.alignItems = 'center'
-			range.style.backgroundColor = 'rgba(255, 0,0, 0.2)'
-			// range.style.border = '1px dotted rgba(0,0, 255, 1)'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'star') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.w + 'px'
+			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
+			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.borderRadius = '50%'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+
+			let range = document.createElement('div')
+			range.className = type + ' range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+
 			obj.appendChild(range)
 			obj.appendChild(visual)
 		}
@@ -705,32 +728,39 @@ class Asteroid {
 			// // obj.style.borderRadius = '50%'
 			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
 		}
-		else if (type === 'star') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.w + 'px'
-			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
-			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
-			// obj.style.backgroundColor = 'rgba(255,255, 255, 0.05)'
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.borderRadius = '50%'
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-			// visual.textContent = item.visual
-			let range = document.createElement('div')
-			range.className = type + ' visual'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.border = '3px dotted rgba(255,255, 255, .05)'
-			// range.style.backgroundColor = 'rgba(255,255, 255, .1)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
 		return obj;
+	}
+	getDevTools = () => {
+		return {
+			refreshconsole: (player) => { // dev tools only // remove this if on prod
+				let ship = player.ships.ships[player.currentship]
+				if (document.getElementById('devconsole')) {
+					document.getElementById('playerimmat').textContent = 'playerimmat:' + this.actualPlayer//player.immat
+					document.getElementById('x').textContent = 'x:' + ship.x
+					document.getElementById('y').textContent = 'y:' + ship.y
+					document.getElementById('z').textContent = 'z:' + ship.z
+					document.getElementById('d').textContent = 'd:' + ship.d
+					document.getElementById('speed').textContent = 'speed:' + ship.speed
+					document.getElementById('move').textContent = 'move:' + ship.mods.move + "/" +
+						ship.mods.moves[ship.mods.move]
+					document.getElementById('limit').textContent = 'limit:' + ship.mods.limit + "/" +
+						ship.mods.limits[ship.mods.limit]
+					document.getElementById('dir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
+					document.getElementById('asteroids').textContent = 'asteroids:' + this.asteroids.lenght
+					document.getElementById('visualhelp').textContent = '[v] Visual Help ?? (' + (this.isVisualHelp ? 'On' : 'Off') + ')'
+
+
+				}
+			},
+			setBugAndPause: (string = false) => {
+				this.isBug = true
+				this.isPause = true
+				if (this.isBug && this.isPause) {
+					console.log('🐛 bug ! game paused')
+					if (string) { console.log('🐛', string) }
+				}
+			}
+		}
 	}
 }
 let isLoaded = () => {
