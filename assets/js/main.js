@@ -288,6 +288,7 @@ class Asteroid {
 						h: 32,
 						l: 32, // 3d
 						d: this.aleaEntreBornes(1, 360),
+						range: { x: 32, y: 32, z: 32 }, // range 
 						pts: 100,
 						lv: this.aleaEntreBornes(1, 3),
 						div: Object
@@ -298,9 +299,7 @@ class Asteroid {
 			addtostack: (asteroid) => {
 				asteroid.div = this.divMaker(asteroid.type, asteroid, false)
 				this.asteroids.asteroids.push(asteroid)
-				// this.asteroids.update_DivPos(asteroid)
 				this.asteroids.addtodom(asteroid)
-				// 	this.asteroids.add(asteroid)
 			},
 			addtodom: (asteroid) => {
 				document.body.appendChild(asteroid.div)
@@ -337,10 +336,9 @@ class Asteroid {
 				if (this.projectils.projectils[0]) {
 					this.projectils.projectils.forEach(projectil => {
 						let distance = this.get_distance(asteroid, projectil);
-						if (!projectil.unarmed) {
+						if (!asteroid.unarmed) {
 							if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
 								this.projectils.addToDeletation(projectil)
-								console.log('boom: ' + asteroid.immat)
 								asteroid.unarmed = true
 								asteroid.div.style.backgroundColor = "black"
 								asteroid.div.classList.add('unarmed')
@@ -349,10 +347,22 @@ class Asteroid {
 						}
 					})
 				}
+				// CHECK COLLiSION with player
+				let ship = this.players.players[this.actualplayer].ships.ships[this.players.players[this.actualplayer].currentship]
+
+				let distance = this.get_distance(asteroid, ship);
+				if (!asteroid.unarmed) {
+					if (distance < ((ship.w / 2) + (asteroid.w / 2))) {
+						// this.projectils.addToDeletation(projectil)
+						asteroid.unarmed = true
+						asteroid.div.style.backgroundColor = "red"
+						asteroid.div.classList.add('unarmed')
+						asteroid.div.textContent = "BOOM"
+					}
+				}
 			}
 		}
 		return data
-
 	}
 	projectilsManager = () => {
 		let data = {
@@ -380,13 +390,13 @@ class Asteroid {
 					y: ship.y,// + (ship.h / 2),
 					z: ship.z,// + (ship.l / 2), // 3d
 					lifedelay: { current: 0, max: 100 },
-					w: 5,
-					h: 5,
-					l: 5, // 3d
+					w: 16,
+					h: 16,
+					l: 16, // 3d
 					type: type,
 					visual: '|',//🧊
 					orbitdelay: [0, 50], // current,orbit refreh delay 
-					range: { x: 30, y: 30, z: 30 }, // range of orbit effect in pixels
+					range: { x: 16, y: 16, z: 16 }, // range
 				}
 				this.projectils.add(projectil, player)
 			},
@@ -481,6 +491,7 @@ class Asteroid {
 					l: 8, // 3d
 					tetha: 0,
 					delayshoot: { current: 0, max: 70 }, //render refresh need between shoot
+					range: { x: 16, y: 16, z: 16 }, // range 
 					div: Object,
 					mods: {
 						limit: 0,
@@ -512,164 +523,6 @@ class Asteroid {
 			}
 		}
 		return data
-	}
-	divMaker = (type, item, player) => {
-		// type Player || Asteroid
-		let obj = document.createElement("div")
-		obj.className = type
-		if (type === 'asteroid') {
-			obj.className = type + '  type-' + item.lv
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			// obj.style.backgroundColor = 'rgba(255, 0, 0, 1)'
-			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
-
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-			visual.style.position = 'absolute'
-			visual.style.width = '8px'
-			visual.style.height = '16px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
-
-			let range = document.createElement('div')
-			range.style.position = 'absolute'
-			range.className = type + ' range'
-			range.style.width = '60px' // 3*3rem
-			range.style.height = '60px' // 3*3rem
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
-			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		if (type === 'ship') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			// obj.style.backgroundColor = 'rgba(0, 0, 0, 1)'
-			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
-
-			let visual = document.createElement('div')
-			visual.className = 'ship visual'
-			visual.style.position = 'absolute'
-			visual.style.width = '8px'
-			visual.style.height = '16px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
-
-			let range = document.createElement('div')
-			range.style.position = 'absolute'
-			range.className = 'ship range'
-			range.style.width = '60px' // 3*3rem
-			range.style.height = '60px' // 3*3rem
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
-			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		else if (type === 'icecube') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
-			// obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
-
-			let visual = document.createElement('div')
-			// visual.className='visual'
-			visual.style.position = 'absolute'
-			visual.style.width = item.range.x + 'px'
-			visual.style.height = item.range.y + 'px'
-			visual.textContent = item.visual
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-
-			let range = document.createElement('div')
-			range.className = type + ' range'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-			// range.style.backgroundColor = 'rgba(255, 255, 0, 0.234)'
-			// range.style.border = '3px dotted rgba(255,255, 255, .2)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		else if (type === 'cosmos') {
-			// obj.style.position = 'absolute'
-			// obj.style.width = '1000px' // 3*3rem
-			// obj.style.height = '1000px' // 3*3rem
-			// obj.style.top = '-500px' // 3*3rem
-			// obj.style.left = '-500px' // 3*3rem
-			// // obj.style.display = 'flex'
-			// // obj.style.justifyContent = 'center'
-			// // obj.style.alignItems = 'center'
-			// // obj.style.borderRadius = '50%'
-			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
-		}
-		else if (type === 'star') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.w + 'px'
-			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
-			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
-			// obj.style.backgroundColor = 'rgba(255,255, 255, 0.05)'
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.borderRadius = '50%'
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-			// visual.textContent = item.visual
-			let range = document.createElement('div')
-			range.className = type + ' visual'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.border = '3px dotted rgba(255,255, 255, .05)'
-			// range.style.backgroundColor = 'rgba(255,255, 255, .1)'
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		return obj;
 	}
 	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
@@ -720,6 +573,164 @@ class Asteroid {
 		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
 		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
 		return Math.sqrt((AB * AB) + (AC * AC))
+	}
+	divMaker = (type, item, player) => {
+		// type Player || Asteroid
+		let obj = document.createElement("div")
+		obj.className = type
+		if (type === 'asteroid') {
+			obj.className = type + '  type-' + item.lv
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.borderRadius = '50%'
+			// obj.style.backgroundColor = 'rgba(255, 0, 0, 1)'
+			obj.style.border = '3px dotted rgba(255,0, 0, .5)'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+
+			let range = document.createElement('div')
+			range.style.position = 'absolute'
+			range.className = type + ' range'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+			// range.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+			range.style.border = '1px dotted rgba(255,255, 255, 1)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		if (type === 'ship') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			// obj.style.backgroundColor = 'rgba(0, 0, 0, 1)'
+			// obj.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let visual = document.createElement('div')
+			visual.className = 'ship visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+			// visual.style.border = '3px dotted rgba(255,255, 255, .2)'
+
+			let range = document.createElement('div')
+			range.style.position = 'absolute'
+			range.className = 'ship range'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+			// range.style.backgroundColor = 'rgba(0, 255, 255, 0.234)'
+			range.style.border = '1px dotted rgba(0,255, 0, 1)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'icecube') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
+			// obj.style.backgroundColor = 'rgba(255, 255, 255, 0.234)'
+
+			let visual = document.createElement('div')
+			// visual.className='visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.textContent = item.visual
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+
+			let range = document.createElement('div')
+			range.className = type + ' range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'center'
+			range.style.backgroundColor = 'rgba(255, 0,0, 0.2)'
+			// range.style.border = '1px dotted rgba(0,0, 255, 1)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'cosmos') {
+			// obj.style.position = 'absolute'
+			// obj.style.width = '1000px' // 3*3rem
+			// obj.style.height = '1000px' // 3*3rem
+			// obj.style.top = '-500px' // 3*3rem
+			// obj.style.left = '-500px' // 3*3rem
+			// // obj.style.display = 'flex'
+			// // obj.style.justifyContent = 'center'
+			// // obj.style.alignItems = 'center'
+			// // obj.style.borderRadius = '50%'
+			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
+		}
+		else if (type === 'star') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.w + 'px'
+			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
+			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
+			// obj.style.backgroundColor = 'rgba(255,255, 255, 0.05)'
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.borderRadius = '50%'
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			// visual.textContent = item.visual
+			let range = document.createElement('div')
+			range.className = type + ' visual'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.border = '3px dotted rgba(255,255, 255, .05)'
+			// range.style.backgroundColor = 'rgba(255,255, 255, .1)'
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		return obj;
 	}
 }
 let isLoaded = () => {
