@@ -5,7 +5,7 @@ class Asteroid {
 		this.isBug = false;
 		this.isNextPlayer = false;
 		this.isVisualHelp = false;
-		this.renderInterval = 100
+		this.renderInterval = 25
 		this.actualPlayer = 0;
 		this.maxPlayer = 2;
 		// -- 
