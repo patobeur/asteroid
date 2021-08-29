@@ -36,7 +36,7 @@ class Asteroid {
 		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
-		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear alerte;opacity: 1;}'
+		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
 
 		this.addCss(stringcss, 'main')
@@ -282,7 +282,7 @@ class Asteroid {
 					let immat = this.asteroids.asteroids.length
 					let asteroid = {
 						immat: immat,
-						speed: 3,
+						speed: 2,
 						type: 'asteroid',
 						x: 32,// - ( ship.w/2),
 						y: 32,// - ( ship.h/2),
@@ -294,7 +294,8 @@ class Asteroid {
 						range: { x: 32, y: 32, z: 32 }, // range 
 						pts: 100,
 						lv: this.aleaEntreBornes(1, 3),
-						div: Object
+						div: Object,
+						nearest: false
 					}
 					this.asteroids.addtostack(asteroid)
 				}
@@ -327,12 +328,32 @@ class Asteroid {
 			},
 			addtoscore: (projectil) => {
 
+
 			},
-			check_collisions: (asteroid) => {
+			check_collisions_projectils: (asteroid) => {
 				// 💡 an idea to make it better ???
 				// collision is true if distance from objects centers is less than both half width's objects summed
+				// CHECK COLLiSION with projectils
+				if (this.projectils.projectils[0]) {
+					this.projectils.projectils.forEach(projectil => {
+						let distance = this.getDistance(asteroid, projectil);
+						if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
+							asteroid.explode = true
 
-				// CHECK COLLiSION with player ship		
+							this.projectils.addToDeletation(projectil)
+							this.asteroids.addToDeletation(asteroid)
+						}
+						// delete asteroids from array
+						this.asteroids.DeleteAsteroids()
+					})
+				}
+
+			},
+			check_collisions_ship: (asteroid) => {
+				// 💡 an idea to make it better ???
+				// collision is true if distance from objects centers is less than both half width's objects summed
+				// if (!asteroid.unarmed) {
+				// CHECK COLLiSION with player ship
 				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
 				let distance = this.getDistance(asteroid, ship);
 				let alertedistancebeforecolliding = 30 // pixels
@@ -355,36 +376,26 @@ class Asteroid {
 						// ship.div.classList.add('unarmed')
 					}
 				}
-
-				// CHECK COLLiSION with projectils
-				if (!asteroid.unarmed) {
-					if (this.projectils.projectils[0]) {
-						this.projectils.projectils.forEach(projectil => {
-							let distance = this.getDistance(asteroid, projectil);
-							if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
-								this.projectils.addToDeletation(projectil)
-								asteroid.unarmed = true
-								asteroid.div.classList.add('unarmed')
-								asteroid.div.textContent = "BOOM"
-								// to do
-								// delete asteroids from array
-							}
-							if (this.asteroids.asteroidstodelete.length > 0) {
-								this.asteroids.DeleteAsteroids(asteroid)
-							}
-						})
-					}
-				}
 			},
 			addToDeletation: (asteroid) => {
-				asteroid.div.remove()
 				this.asteroids.asteroidstodelete.push(asteroid)
 			},
-			DeleteAsteroids: (asteroid) => {
-				// delete projectil
+			DeleteAsteroids: () => {
+				// delete asteroids
 				if (this.asteroids.asteroidstodelete.length > 0) {
 					this.asteroids.asteroidstodelete.forEach(asteroid => {
-						this.asteroids.asteroids.splice(asteroid, 1);
+						asteroid.div.classList.add('unarmed')
+						asteroid.div.textContent = "BOOM"
+						asteroid.div.style.backgroundColor = 'white'
+						let nb = 0
+						let asteroidtodelete = false
+						this.asteroids.asteroids.forEach(element => {
+							if (element.immat === asteroid.immat) {
+								asteroidtodelete = nb
+							}
+							nb++
+						});
+						this.asteroids.asteroids.splice(asteroidtodelete, 1);
 					})
 					this.asteroids.asteroidstodelete = []
 				}
@@ -394,21 +405,29 @@ class Asteroid {
 				let smallestDistance = 999999
 				let player = this.players.players[this.actualPlayer]
 				let ship = player.ships.ships[player.currentship]
-				if (this.asteroids.asteroids[0] && !this.isPause) {
+				if (this.asteroids.asteroids.length > 0 && !this.isPause) {
+
 					//-- forEach asteroid
 					this.asteroids.asteroids.forEach(asteroid => {
 						this.asteroids.update_DivPos(asteroid)
-						asteroid.div.classList.remove('nearest')
+
+
 						// get nearest asteroid from ship
+						asteroid.div.classList.remove('nearest')
+						asteroid.nearest = false
 						let distance = this.getDistance(asteroid, ship)
 						if (distance < smallestDistance) {
 							smallestDistance = distance
 							nearestAsteroidImmat = asteroid.immat
 						}
+						this.asteroids.check_collisions_projectils(asteroid)
 					})
 
-					this.asteroids.asteroids[nearestAsteroidImmat].div.classList.add('nearest')
-					this.asteroids.check_collisions(this.asteroids.asteroids[nearestAsteroidImmat])
+					if (this.asteroids.asteroids[nearestAsteroidImmat]) {
+						this.asteroids.asteroids[nearestAsteroidImmat].nearest = true
+						this.asteroids.asteroids[nearestAsteroidImmat].div.classList.add('nearest')
+						this.asteroids.check_collisions_ship(this.asteroids.asteroids[nearestAsteroidImmat])
+					}
 				}
 			},
 		}
@@ -439,7 +458,7 @@ class Asteroid {
 					x: ship.x,// + (ship.w / 2),
 					y: ship.y,// + (ship.h / 2),
 					z: ship.z,// + (ship.l / 2), // 3d
-					lifedelay: { current: 0, max: 100 },
+					lifedelay: { current: 0, max: 40 },
 					w: 16,
 					h: 16,
 					l: 16, // 3d
@@ -463,7 +482,7 @@ class Asteroid {
 				projectil.div.remove()
 				this.projectils.projectilstodelete.push(projectil)
 			},
-			DeleteProjectils: (projectil) => {
+			DeleteProjectils: () => {
 				// delete projectil
 				if (this.projectils.projectilstodelete.length > 0) {
 					this.projectils.projectilstodelete.forEach(projectil => {
