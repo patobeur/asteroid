@@ -5,6 +5,7 @@ class Asteroid {
 		this.isBug = false;
 		this.isNextPlayer = false;
 		this.isVisualHelp = false;
+		this.isDisplayInfo = false;
 		this.renderInterval = 25
 		this.actualPlayer = 0;
 		this.maxPlayer = 2;
@@ -26,6 +27,8 @@ class Asteroid {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
+		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
+		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
 		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
@@ -600,6 +603,7 @@ class Asteroid {
 			let player = this.players.players[this.actualPlayer]
 			let ship = player.ships.ships[player.currentship]
 
+			if (eventkeydown.key === "i") { this.setDisplayInfo() }
 			if (eventkeydown.key === "p") { this.setPause() }
 			if (eventkeydown.key === "v") { this.setVisualHelp() }
 			if (eventkeydown.key === "n") { ship.mods.next('move') }
@@ -640,6 +644,15 @@ class Asteroid {
 		}
 		else {
 			document.getElementById('visual').remove()
+		}
+	}
+	setDisplayInfo() {
+		this.isDisplayInfo = !this.isDisplayInfo
+		if (this.isDisplayInfo) {
+			document.getElementById('devconsole').classList.add('active')
+		}
+		else {
+			document.getElementById('devconsole').classList.remove('active')
 		}
 	}
 	getDistance = (a, b) => { // get hypotenus with pythaGore
