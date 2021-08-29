@@ -26,7 +26,7 @@ class Asteroid {
 	createAndAddCss = () => {
 		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
-		stringcss += '#devconsole {position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
+		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
 		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
 		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
 		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
@@ -34,11 +34,13 @@ class Asteroid {
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
 		stringcss += '.asteroid.nearest {background-Color:green}'
-		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
+		stringcss += '.ship {background-color:#474350}'
+		stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
 
@@ -563,7 +565,7 @@ class Asteroid {
 					l: 8, // 3d
 					tetha: 0,
 					delayshoot: { current: 0, max: 70 }, //render refresh need between shoot
-					range: { x: 16, y: 16, z: 16 }, // range 
+					range: { x: 40, y: 40, z: 40 }, // range 
 					div: Object,
 					mods: {
 						limit: 0,
@@ -638,8 +640,9 @@ class Asteroid {
 		this.isVisualHelp = !this.isVisualHelp
 		if (this.isVisualHelp) {
 			let visual = '.ship.range {border: 1px dotted rgba(0, 255, 0, 1);}'
+			visual += '.ship {background-color:greenyellow}'
 			visual += '.asteroid.range {border: 1px dotted rgba(0, 255, 0, 1);}'
-			visual += '.projectil.range {background-color:rgba(0, 255, 0, 1);;border: 1px dotted rgba(0, 255, 0, 1);}'
+			visual += '.projectil.range {background-color:rgba(0, 255, 0, 1);border: 1px dotted rgba(0, 255, 0, 1);}'
 			this.addCss(visual, 'visual')
 		}
 		else {
@@ -669,7 +672,9 @@ class Asteroid {
 			obj.style.position = 'absolute'
 			obj.style.width = item.w + 'px'
 			obj.style.height = item.h + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			// obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+
+			obj.style.zIndex = -10
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
