@@ -30,11 +30,14 @@ class Asteroid {
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
+		stringcss += '.asteroid.nearest {background-Color:red}'
 		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: Adobe Illustrator 19.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0) --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-attachment: fixed;background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
+		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear alerte;opacity: 1;}'
+		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
 
 		this.addCss(stringcss, 'main')
 	}
@@ -117,6 +120,7 @@ class Asteroid {
 					lifetime: 0,
 					gameover: 0,
 					lives: 3,
+					lv: 0,
 					dir: { right: 0, left: 0, up: 0, down: 0 }, // right, left (arrows keys downned)
 					type: 'ship',
 					ships: this.shipsManager('ship'),
@@ -325,20 +329,30 @@ class Asteroid {
 
 			},
 			check_collisions: (asteroid) => {
-				// 💡 an idea to make it better !!!!
+				// 💡 an idea to make it better ???
 				// collision is true if distance from objects centers is less than both half width's objects summed
 
 				// CHECK COLLiSION with player ship		
 				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
 				let distance = this.getDistance(asteroid, ship);
-				let alertedistancebeforecolliding = 30
+				let alertedistancebeforecolliding = 30 // pixels
+				let deadrange = ((ship.w / 2) + (asteroid.w / 2))
+				let alerterange = deadrange + alertedistancebeforecolliding
 				if (!asteroid.unarmed) {
-					if (distance < ((ship.w / 2) + (asteroid.w / 2))) {
+					// alerte distance
+					if ((distance) < alerterange) {
+						ship.div.classList.add('alerte')
+					}
+					else {
+						ship.div.classList.remove('alerte')
+					}
+					// colliding
+					if (distance < deadrange) {
 						// this.projectils.addToDeletation(projectil)
 						asteroid.unarmed = true
 						asteroid.div.classList.add('unarmed')
 						asteroid.div.textContent = "BOOM"
-						ship.div.classList.add('unarmed')
+						// ship.div.classList.add('unarmed')
 					}
 				}
 
@@ -354,7 +368,6 @@ class Asteroid {
 								asteroid.div.textContent = "BOOM"
 								// to do
 								// delete asteroids from array
-
 							}
 							if (this.asteroids.asteroidstodelete.length > 0) {
 								this.asteroids.DeleteAsteroids(asteroid)
@@ -376,12 +389,26 @@ class Asteroid {
 					this.asteroids.asteroidstodelete = []
 				}
 			},
-			renderAsteroids: (asteroid) => {
+			renderAsteroids: () => {
+				let nearestAsteroidImmat = false
+				let smallestDistance = 999999
+				let player = this.players.players[this.actualPlayer]
+				let ship = player.ships.ships[player.currentship]
 				if (this.asteroids.asteroids[0] && !this.isPause) {
+					//-- forEach asteroid
 					this.asteroids.asteroids.forEach(asteroid => {
 						this.asteroids.update_DivPos(asteroid)
-						this.asteroids.check_collisions(asteroid)
+						asteroid.div.classList.remove('nearest')
+						// get nearest asteroid from ship
+						let distance = this.getDistance(asteroid, ship)
+						if (distance < smallestDistance) {
+							smallestDistance = distance
+							nearestAsteroidImmat = asteroid.immat
+						}
 					})
+
+					this.asteroids.asteroids[nearestAsteroidImmat].div.classList.add('nearest')
+					this.asteroids.check_collisions(this.asteroids.asteroids[nearestAsteroidImmat])
 				}
 			},
 		}
@@ -760,15 +787,18 @@ class Asteroid {
 				let nbProjectils = this.projectils.projectils.length
 				if (document.getElementById('devconsole')) {
 					document.getElementById('devplayerimmat').textContent = 'playerimmat:' + this.actualPlayer//player.immat
+
+					document.getElementById('devlives').textContent = 'lives:' + player.lives
+					document.getElementById('devscore').textContent = 'score:' + player.score
+					document.getElementById('devlv').textContent = 'lv:' + player.lv
+
 					document.getElementById('devx').textContent = 'x:' + ship.x
 					document.getElementById('devy').textContent = 'y:' + ship.y
 					document.getElementById('devz').textContent = 'z:' + ship.z
-					document.getElementById('devd').textContent = 'd:' + ship.d
+					document.getElementById('devd').textContent = 'd:' + ship.d + '°'
 					document.getElementById('devspeed').textContent = 'speed:' + ship.speed
-					document.getElementById('devmove').textContent = 'move:' + ship.mods.move + " [" +
-						ship.mods.moves[ship.mods.move] + ']'
-					document.getElementById('devlimit').textContent = 'limit:' + ship.mods.limit + " [" +
-						ship.mods.limits[ship.mods.limit] + ']'
+					document.getElementById('devmove').textContent = 'move:' + ship.mods.move + " [" + ship.mods.moves[ship.mods.move] + ']'
+					document.getElementById('devlimit').textContent = 'limit:' + ship.mods.limit + " [" + ship.mods.limits[ship.mods.limit] + ']'
 					document.getElementById('devdir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
 					document.getElementById('devasteroids').textContent = 'asteroids[]:' + nbAsteroids
 					document.getElementById('devprojectils').textContent = 'projectils[]:' + nbProjectils
