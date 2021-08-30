@@ -370,7 +370,7 @@ class Asteroid {
 		return obj;
 	}
 	createAndAddCss = () => {
-		let stringcss = '@font-face { font-family: "vectorbattle";src: url("/assets/fonts/VectorBattle.ttf") format("truetype")}'
+		let stringcss = '@font-face { font-family: "vectorbattle";src: url("assets/fonts/VectorBattle.ttf") format("truetype")}'
 		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;color:white;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
