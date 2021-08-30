@@ -204,6 +204,7 @@ class Asteroid {
 			},
 			removeinfo: () => {
 				this.front.title.div.remove()
+				this.front.subtitle.div.remove()
 				this.front.footer.div.remove()
 				this.front.footer2.div.remove()
 				this.front.coins.div.remove()
