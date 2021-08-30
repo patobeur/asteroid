@@ -10,12 +10,16 @@ class Asteroid {
 		this.actualPlayer = 0;
 		this.maxPlayer = 2;
 		// -- 
+		// Modal principal
+		this.front = this.FrontManager()
+		// -- 
 		this.center = { x: (window.innerWidth / 2), y: (window.innerHeight / 2), z: 0 }
 		this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
 		// this.screenRatio = {w:1,h:1,l:1}
 		// this.cosmos = this.cosmosManager()
 		this.devTools = this.getDevTools() // dev tools
 		// --
+		this.front.create()
 		this.players = this.playersManager()
 		this.stars = this.starsManager() // not really needed
 		this.projectils = this.projectilsManager()
@@ -23,14 +27,223 @@ class Asteroid {
 		this.createAndAddCss()
 		this.startGame()
 	}
+
+	FrontManager = () => {
+		let front = {
+			title: {
+				content: 'asteroid',
+				type: 'title',
+				div: Object
+			},
+			footer: {
+				content: '1 coin 1 play',
+				type: 'footer',
+				div: Object
+			},
+			footer2: {
+				content: 'asteroids by PatAtari',
+				type: 'footer2',
+				div: Object
+			},
+			div: Object,
+			addtodom: () => {
+				document.body.appendChild(this.front.title.div)
+				document.body.appendChild(this.front.footer.div)
+				document.body.appendChild(this.front.footer2.div)
+				// front.div.appendChild(front.title.div)
+				// front.div.appendChild(front.footer.div)
+				// front.div.appendChild(front.footer2.div)
+				// document.body.appendChild(front.div)
+			},
+			create: () => {
+				this.front.title.div = this.front.divMaker(this.front.title)
+				this.front.footer.div = this.front.divMaker(this.front.footer)
+				this.front.footer2.div = this.front.divMaker(this.front.footer2)
+				this.front.addtodom()
+			},
+			divMaker: (frontpart) => {
+				let obj = document.createElement("div")
+				obj.className = frontpart.type
+				obj.textContent = frontpart.content
+				obj.style.color = 'white'
+				obj.style.position = 'absolute'
+				obj.style.left = '50%'
+				// obj.style.zIndex = '1000'
+				if (frontpart.type === 'title') {
+					obj.style.top = '25%'
+					obj.style.transform = 'translateX(-50%)'
+				}
+				if (frontpart.type === 'footer') {
+					obj.style.bottom = '15%'
+					obj.style.transform = 'translate(-50%, -50%)'
+				}
+				if (frontpart.type === 'footer2') {
+					obj.style.bottom = '2%'
+					obj.style.fontSize = '.7rem'
+					obj.style.transform = 'translate(-50%, -50%)'
+				}
+				return obj;
+			}
+		}
+		return front
+	}
+	divMaker = (type, item, player) => {
+		// type Player || Asteroid
+		let obj = document.createElement("div")
+		obj.className = type
+		if (type === 'asteroid') {
+			obj.className = type + '  type-' + item.lv
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			// obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+
+			obj.style.zIndex = -10
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.borderRadius = '50%'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+			visual.style.borderRadius = '50%'
+
+			let range = document.createElement('div')
+			range.className = type + ' range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		if (type === 'ship') {
+			obj.style.position = 'absolute'
+			obj.className = type
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+
+			let range = document.createElement('div')
+			range.style.position = 'absolute'
+			range.className = type + ' range'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'start'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'icecube') {
+			obj.className = 'projectil ' + type
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.h + 'px'
+			obj.style.left = item.x + 'px'
+			obj.style.top = item.y + 'px'
+			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.color = 'white'
+			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
+
+			let visual = document.createElement('div')
+			visual.className = 'projectil visual'
+			visual.textContent = item.visual
+			visual.style.position = 'absolute'
+			visual.style.width = item.w + 'px'
+			visual.style.height = item.h + 'px'
+			visual.style.display = 'flex'
+			visual.style.justifyContent = 'center'
+			visual.style.alignItems = 'center'
+
+			let range = document.createElement('div')
+			range.className = 'projectil range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+			range.style.display = 'flex'
+			range.style.justifyContent = 'center'
+			range.style.alignItems = 'center'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'star') {
+			obj.style.position = 'absolute'
+			obj.style.width = item.w + 'px'
+			obj.style.height = item.w + 'px'
+			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
+			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
+			obj.style.display = 'flex'
+			obj.style.justifyContent = 'center'
+			obj.style.alignItems = 'center'
+			obj.style.borderRadius = '50%'
+
+			let visual = document.createElement('div')
+			visual.className = type + ' visual'
+
+			let range = document.createElement('div')
+			range.className = type + ' range'
+			range.style.position = 'absolute'
+			range.style.width = item.range.x + 'px'
+			range.style.height = item.range.y + 'px'
+			range.style.borderRadius = '50%'
+
+			obj.appendChild(range)
+			obj.appendChild(visual)
+		}
+		else if (type === 'cosmos') {
+			// obj.style.position = 'absolute'
+			// obj.style.width = '1000px' // 3*3rem
+			// obj.style.height = '1000px' // 3*3rem
+			// obj.style.top = '-500px' // 3*3rem
+			// obj.style.left = '-500px' // 3*3rem
+			// // obj.style.display = 'flex'
+			// // obj.style.justifyContent = 'center'
+			// // obj.style.alignItems = 'center'
+			// // obj.style.borderRadius = '50%'
+			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
+		}
+		return obj;
+	}
 	createAndAddCss = () => {
-		let stringcss = 'body {overflow: hidden;font-family: monospace;background-color: #202020;width: 100%;height: 100%;}'
+		let stringcss = '@font-face { font-family: "vectorbattle";src: url("/assets/fonts/VectorBattle.ttf") format("truetype")}'
+		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
-		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
-		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
-		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
-		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
 		stringcss += '.asteroid.nearest {background-Color:green}'
@@ -40,9 +253,14 @@ class Asteroid {
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
 		stringcss += '.ship {background-color:#474350}'
+		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
+		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
+		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
+		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
+		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 
 		this.addCss(stringcss, 'main')
 	}
@@ -662,159 +880,6 @@ class Asteroid {
 		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
 		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
 		return Math.sqrt((AB * AB) + (AC * AC))
-	}
-	divMaker = (type, item, player) => {
-		// type Player || Asteroid
-		let obj = document.createElement("div")
-		obj.className = type
-		if (type === 'asteroid') {
-			obj.className = type + '  type-' + item.lv
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			// obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-
-			obj.style.zIndex = -10
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			obj.style.borderRadius = '50%'
-
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-			visual.style.position = 'absolute'
-			visual.style.width = item.w + 'px'
-			visual.style.height = item.h + 'px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-			visual.style.borderRadius = '50%'
-
-			let range = document.createElement('div')
-			range.className = type + ' range'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		if (type === 'ship') {
-			obj.style.position = 'absolute'
-			obj.className = type
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-			visual.style.position = 'absolute'
-			visual.style.width = item.w + 'px'
-			visual.style.height = item.h + 'px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-
-			let range = document.createElement('div')
-			range.style.position = 'absolute'
-			range.className = type + ' range'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'start'
-
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		else if (type === 'icecube') {
-			obj.className = 'projectil ' + type
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.h + 'px'
-			obj.style.left = item.x + 'px'
-			obj.style.top = item.y + 'px'
-			obj.style.zIndex = parseInt(item.z - (item.l / 2)) // 3d
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
-			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
-
-			let visual = document.createElement('div')
-			visual.className = 'projectil visual'
-			visual.textContent = item.visual
-			visual.style.position = 'absolute'
-			visual.style.width = item.w + 'px'
-			visual.style.height = item.h + 'px'
-			visual.style.display = 'flex'
-			visual.style.justifyContent = 'center'
-			visual.style.alignItems = 'center'
-
-			let range = document.createElement('div')
-			range.className = 'projectil range'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-			range.style.display = 'flex'
-			range.style.justifyContent = 'center'
-			range.style.alignItems = 'center'
-
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		else if (type === 'star') {
-			obj.style.position = 'absolute'
-			obj.style.width = item.w + 'px'
-			obj.style.height = item.w + 'px'
-			obj.style.top = (this.center.y - (item.h / 2)) + 'px'
-			obj.style.left = (this.center.x - (item.w / 2)) + 'px'
-			obj.style.display = 'flex'
-			obj.style.justifyContent = 'center'
-			obj.style.alignItems = 'center'
-			obj.style.borderRadius = '50%'
-
-			let visual = document.createElement('div')
-			visual.className = type + ' visual'
-
-			let range = document.createElement('div')
-			range.className = type + ' range'
-			range.style.position = 'absolute'
-			range.style.width = item.range.x + 'px'
-			range.style.height = item.range.y + 'px'
-			range.style.borderRadius = '50%'
-
-			obj.appendChild(range)
-			obj.appendChild(visual)
-		}
-		else if (type === 'cosmos') {
-			// obj.style.position = 'absolute'
-			// obj.style.width = '1000px' // 3*3rem
-			// obj.style.height = '1000px' // 3*3rem
-			// obj.style.top = '-500px' // 3*3rem
-			// obj.style.left = '-500px' // 3*3rem
-			// // obj.style.display = 'flex'
-			// // obj.style.justifyContent = 'center'
-			// // obj.style.alignItems = 'center'
-			// // obj.style.borderRadius = '50%'
-			// obj.style.backgroundColor = 'rgba(255, 0, 255, 0.234)'
-		}
-		return obj;
 	}
 	getDevTools = () => {
 		return {
