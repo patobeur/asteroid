@@ -9,6 +9,7 @@ class Asteroid {
 		this.renderInterval = 25
 		this.actualPlayer = 0;
 		this.maxPlayer = 2;
+		this.coins = 0;
 		// -- 
 		// Modal principal
 		this.front = this.FrontManager()
@@ -25,11 +26,41 @@ class Asteroid {
 		this.projectils = this.projectilsManager()
 		this.asteroids = this.asteroidsManager()
 		this.createAndAddCss()
-		this.startGame()
+		this.addEventKeyHelp()
+		// this.startGame()
 	}
-
 	FrontManager = () => {
 		let front = {
+			up: {
+				content: 'faster',
+				type: 'up',
+				div: Object
+			},
+			touch: {
+				content: '',
+				type: 'touch',
+				div: Object
+			},
+			down: {
+				content: 'Slower',
+				type: 'down',
+				div: Object
+			},
+			shoot: {
+				content: 'shoot',
+				type: 'shoot',
+				div: Object
+			},
+			left: {
+				content: 'Left',
+				type: 'left',
+				div: Object
+			},
+			right: {
+				content: 'Right',
+				type: 'right',
+				div: Object
+			},
 			title: {
 				content: 'asteroid',
 				type: 'title',
@@ -45,44 +76,142 @@ class Asteroid {
 				type: 'footer2',
 				div: Object
 			},
-			div: Object,
-			addtodom: () => {
-				document.body.appendChild(this.front.title.div)
-				document.body.appendChild(this.front.footer.div)
-				document.body.appendChild(this.front.footer2.div)
-				// front.div.appendChild(front.title.div)
-				// front.div.appendChild(front.footer.div)
-				// front.div.appendChild(front.footer2.div)
-				// document.body.appendChild(front.div)
+			scorep1: {
+				content: 0,
+				type: 'scorep1',
+				div: Object
+			},
+			scorep2: {
+				content: 0,
+				type: 'scorep2',
+				div: Object
+			},
+			coins: {
+				content: 0,
+				type: 'coins',
+				div: Object
+			},
+			content: 0,
+			type: 'scorep2',
+			div: {
+				content: '',
+				type: 'touch',
+				div: Object
 			},
 			create: () => {
+				this.front.createScores()
+				this.front.createInfo()
+			},
+			createTouch: () => {
+				let player = this.players.players[this.actualPlayer]
+				this.front.up.div = this.front.divMaker(this.front.up)
+				this.front.down.div = this.front.divMaker(this.front.down)
+				this.front.left.div = this.front.divMaker(this.front.left)
+				this.front.right.div = this.front.divMaker(this.front.right)
+				this.front.shoot.div = this.front.divMaker(this.front.shoot)
+
+				this.front.up.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].ships.changespeed('ArrowUp') })
+				this.front.down.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].ships.changespeed('ArrowDown') })
+				this.front.left.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].changedir('ArrowLeft') })
+				this.front.right.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].changedir('ArrowRight') })
+				this.front.shoot.div.addEventListener('click', () => { this.players.players[this.actualPlayer].ships.shoot('icecube') })
+
+
+
+				this.front.div = this.front.divMaker(this.front.div)
+				this.front.div.appendChild(this.front.up.div)
+				this.front.div.appendChild(this.front.down.div)
+				this.front.div.appendChild(this.front.left.div)
+				this.front.div.appendChild(this.front.right.div)
+
+				document.body.appendChild(this.front.div)
+				document.body.appendChild(this.front.shoot.div)
+			},
+			createScores: () => {
+				this.front.scorep1.div = this.front.divMaker(this.front.scorep1)
+				this.front.scorep2.div = this.front.divMaker(this.front.scorep2)
+				document.body.appendChild(this.front.scorep1.div)
+				document.body.appendChild(this.front.scorep2.div)
+			},
+			createInfo: () => {
 				this.front.title.div = this.front.divMaker(this.front.title)
 				this.front.footer.div = this.front.divMaker(this.front.footer)
 				this.front.footer2.div = this.front.divMaker(this.front.footer2)
-				this.front.addtodom()
+				this.front.coins.div = this.front.divMaker(this.front.coins)
+				document.body.appendChild(this.front.title.div)
+				document.body.appendChild(this.front.footer.div)
+				document.body.appendChild(this.front.footer2.div)
+				document.body.appendChild(this.front.coins.div)
 			},
 			divMaker: (frontpart) => {
 				let obj = document.createElement("div")
 				obj.className = frontpart.type
 				obj.textContent = frontpart.content
-				obj.style.color = 'white'
+				// obj.style.color = 'white'
 				obj.style.position = 'absolute'
-				obj.style.left = '50%'
-				// obj.style.zIndex = '1000'
 				if (frontpart.type === 'title') {
-					obj.style.top = '25%'
+					obj.style.top = '50%'
+					obj.style.left = '50%'
+					obj.style.fontSize = '2rem'
 					obj.style.transform = 'translateX(-50%)'
 				}
 				if (frontpart.type === 'footer') {
 					obj.style.bottom = '15%'
+					obj.style.left = '50%'
 					obj.style.transform = 'translate(-50%, -50%)'
 				}
 				if (frontpart.type === 'footer2') {
 					obj.style.bottom = '2%'
-					obj.style.fontSize = '.7rem'
+					obj.style.left = '50%'
+					obj.style.fontSize = '.5rem'
 					obj.style.transform = 'translate(-50%, -50%)'
 				}
+				if (frontpart.type === 'scorep1') {
+					obj.style.top = '15%'
+					obj.style.left = '25%'
+					// obj.style.transform = 'translate(-50%, -50%)'
+				}
+				if (frontpart.type === 'scorep2') {
+					obj.style.top = '15%'
+					obj.style.right = '25%'
+					// obj.style.transform = 'translate(-50%, -50%)'
+				}
+				if (frontpart.type === 'coins') {
+					obj.style.top = '20%'
+					obj.style.left = '50%'
+					obj.style.fontSize = '.7rem'
+					obj.style.transform = 'translateX(-50%)'
+				}
 				return obj;
+			},
+			addCoin: () => {
+				this.coins = this.coins < 99 ? this.coins + 1 : this.coins
+				this.front.coins.div.textContent = this.coins
+			},
+			removeinfo: () => {
+				this.front.title.div.remove()
+				this.front.footer.div.remove()
+				this.front.footer2.div.remove()
+				this.front.coins.div.remove()
+			},
+			removeTouch: () => {
+				this.front.left.div.remove()
+				this.front.right.div.remove()
+				this.front.shoot.div.remove()
+			},
+			addScore: (source) => {
+				let player = this.players.players[this.actualPlayer]
+				let ship = player.ships.ships[player.currentship]
+				if (source.pts > 0 && (player.score === 0 || player.score > 0)) {
+					player.score = player.score + parseInt(source.pts)
+					this.front['scorep' + (this.actualPlayer + 1)].div.textContent = parseInt(player.score)
+				}
+			},
+			checkfront: (source) => {
+				// let ship = player.ships.ships[player.currentship]
+				if (this.actualPlayer) {
+					console.log(source)
+				}
 			}
 		}
 		return front
@@ -102,7 +231,7 @@ class Asteroid {
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
+			// obj.style.color = 'white'
 			obj.style.left = item.x + 'px'
 			obj.style.top = item.y + 'px'
 			obj.style.borderRadius = '50%'
@@ -139,7 +268,7 @@ class Asteroid {
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
+			// obj.style.color = 'white'
 			obj.style.left = item.x + 'px'
 			obj.style.top = item.y + 'px'
 
@@ -176,7 +305,7 @@ class Asteroid {
 			obj.style.display = 'flex'
 			obj.style.justifyContent = 'center'
 			obj.style.alignItems = 'center'
-			obj.style.color = 'white'
+			// obj.style.color = 'white'
 			obj.style.transform = 'rotate(' + (item.d + 90) + 'deg)'
 
 			let visual = document.createElement('div')
@@ -242,7 +371,7 @@ class Asteroid {
 	}
 	createAndAddCss = () => {
 		let stringcss = '@font-face { font-family: "vectorbattle";src: url("/assets/fonts/VectorBattle.ttf") format("truetype")}'
-		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;}'
+		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;color:white;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
@@ -270,25 +399,35 @@ class Asteroid {
 		style.id = styleid
 		document.getElementsByTagName('head')[0].appendChild(style);
 	}
-	startGame = () => {
-		//cosomos
-		// this.cosmos.addtodom()
+	startGame = (nbplayer = false) => {
+		if (nbplayer) {
+			if (nbplayer === 1) {
 
-		// STARS ?? REALY NOT NEEDED
-		if (this.stars) {
-			this.stars.create()
-			this.stars.add()
+			}
+			else if (nbplayer === 2) {
+
+			}
+
+			// cosmos
+			// this.cosmos.addtodom()
+			this.front.removeinfo()
+			this.front.createTouch()
+			// STARS ?? REALY NOT NEEDED
+			if (this.stars) {
+				this.stars.create()
+				this.stars.add()
+			}
+
+			// PLAYERS
+			this.players.create()
+			this.players.players[this.actualPlayer].ships.addtodom()
+			// ASTEROIDS
+			this.asteroids.create()
+
+			//RENDER 
+			setInterval(() => { this.render() }, this.renderInterval);
+			this.addEventKey()
 		}
-
-		// PLAYERS
-		this.players.create()
-		this.players.players[this.actualPlayer].ships.addtodom()
-		// ASTEROIDS
-		this.asteroids.create()
-
-		//RENDER 
-		setInterval(() => { this.render() }, this.renderInterval);
-		this.addEventKey()
 	}
 	render = () => {
 		if (!this.isPause) {
@@ -342,7 +481,7 @@ class Asteroid {
 					score: 0,
 					lifetime: 0,
 					gameover: 0,
-					lives: 3,
+					lives: 0,
 					lv: 0,
 					dir: { right: 0, left: 0, up: 0, down: 0 }, // right, left (arrows keys downned)
 					type: 'ship',
@@ -391,6 +530,8 @@ class Asteroid {
 						if (player.ships.ships[player.currentship]) {
 							// player.ships.ships.forEach(ship => {
 							if (player.ships.ships[player.currentship].mods) {
+
+								player.ships.shootRefreshDelay(player, player.ships.ships[player.currentship])
 								player.checkdir(player)
 								this.players.check_PlayerMoves(player)
 								this.players.check_ShipPos(player)
@@ -549,10 +690,6 @@ class Asteroid {
 				if (asteroid.y < (0 - (asteroid.h / 2))) { asteroid.y = this.screen.h - 1 }
 				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
 			},
-			addtoscore: (projectil) => {
-
-
-			},
 			check_collisions_projectils: (asteroid) => {
 				// 💡 an idea to make it better ???
 				// collision is true if distance from objects centers is less than both half width's objects summed
@@ -563,6 +700,7 @@ class Asteroid {
 						if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
 							asteroid.explode = true
 
+							this.front.addScore(asteroid)
 							this.projectils.addToDeletation(projectil)
 							this.asteroids.addToDeletation(asteroid)
 						}
@@ -760,10 +898,23 @@ class Asteroid {
 						break
 				}
 			},
+			shootRefreshDelay: (player, ship) => {
+				// let player = this.players.players[this.actualPlayer]
+				// let ship = player.ships.ships[player.currentship]
+				if (ship.delayshoot.current > 0) {
+					ship.delayshoot.current += 1
+				}
+				if (ship.delayshoot.current >= ship.delayshoot.max) {
+					ship.delayshoot.current = 0
+				}
+			},
 			shoot: (type) => {
 				let player = this.players.players[this.actualPlayer]
-				// let ship = player.ships.ships[player.currentship]
-				this.projectils.create(type, player)
+				let ship = player.ships.ships[player.currentship]
+				if (ship.delayshoot.current < 1) {
+					ship.delayshoot.current = 1
+					this.projectils.create(type, player)
+				}
 			},
 			getnewship: (player) => {
 				player = this.players.players[player.immat]
@@ -782,7 +933,7 @@ class Asteroid {
 					h: 16,
 					l: 8, // 3d
 					tetha: 0,
-					delayshoot: { current: 0, max: 70 }, //render refresh need between shoot
+					delayshoot: { current: 0, max: 12 },
 					range: { x: 40, y: 40, z: 40 }, // range 
 					div: Object,
 					mods: {
@@ -816,22 +967,29 @@ class Asteroid {
 		}
 		return data
 	}
+	addEventKeyHelp() {
+		document.onkeydown = (eventkeydown) => {
+			if (eventkeydown.key === "i") { this.setDisplayInfo() }
+			if (eventkeydown.key === "&" || eventkeydown.key === "1") { this.startGame(1) }
+			if (eventkeydown.key === "é" || eventkeydown.key === "2") { this.startGame(2) }
+			if (eventkeydown.key === "c") { this.front.addCoin() }
+			if (eventkeydown.key === "n") { ship.mods.next('move') }
+			if (eventkeydown.key === "j") { ship.mods.preview('move') }
+			if (eventkeydown.key === "l") { ship.mods.next('limit') } // 3d
+			if (eventkeydown.key === "k") { ship.mods.preview('limit') }
+			if (eventkeydown.key === "v") { this.setVisualHelp() }
+		}
+	}
 	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
-			// console.log(eventkeydown.key)
-
 			let player = this.players.players[this.actualPlayer]
 			let ship = player.ships.ships[player.currentship]
 
 			if (eventkeydown.key === "i") { this.setDisplayInfo() }
 			if (eventkeydown.key === "p") { this.setPause() }
 			if (eventkeydown.key === "v") { this.setVisualHelp() }
-			if (eventkeydown.key === "n") { ship.mods.next('move') }
-			if (eventkeydown.key === "j") { ship.mods.preview('move') }
-			if (eventkeydown.key === "l") { ship.mods.next('limit') } // 3d
-			if (eventkeydown.key === "k") { ship.mods.preview('limit') }
-			if (eventkeydown.key === " ") { player.ships.shoot('icecube') }
 
+			if (eventkeydown.key === " ") { player.ships.shoot('icecube') }
 			if (eventkeydown.key === "ArrowLeft") { player.changedir(eventkeydown.key) }
 			if (eventkeydown.key === "ArrowRight") { player.changedir(eventkeydown.key) }
 			if (eventkeydown.key === "ArrowUp") { player.ships.changespeed(eventkeydown.key) }
@@ -849,7 +1007,6 @@ class Asteroid {
 		}, true)
 
 		if (document.getElementById('devconsole')) {
-			console.log('ok')
 			document.getElementById('devconsole').addEventListener('click', (event) => {
 				this.setDisplayInfo()
 			})
@@ -868,6 +1025,7 @@ class Asteroid {
 			visual += '.ship {background-color:greenyellow}'
 			visual += '.asteroid.range {border: 1px dotted rgba(0, 255, 0, 1);}'
 			visual += '.projectil.range {background-color:rgba(0, 255, 0, 1);border: 1px dotted rgba(0, 255, 0, 1);}'
+			visual += '*,fill {color:yellow;}'
 			this.addCss(visual, 'visual')
 		}
 		else {
