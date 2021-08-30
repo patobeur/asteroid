@@ -62,8 +62,13 @@ class Asteroid {
 				div: Object
 			},
 			title: {
-				content: 'asteroid',
+				content: 'Asteroid',
 				type: 'title',
+				div: Object
+			},
+			subtitle: {
+				content: 'tribute',
+				type: 'subtitle',
 				div: Object
 			},
 			footer: {
@@ -135,10 +140,12 @@ class Asteroid {
 			},
 			createInfo: () => {
 				this.front.title.div = this.front.divMaker(this.front.title)
+				this.front.subtitle.div = this.front.divMaker(this.front.subtitle)
 				this.front.footer.div = this.front.divMaker(this.front.footer)
 				this.front.footer2.div = this.front.divMaker(this.front.footer2)
 				this.front.coins.div = this.front.divMaker(this.front.coins)
 				document.body.appendChild(this.front.title.div)
+				document.body.appendChild(this.front.subtitle.div)
 				document.body.appendChild(this.front.footer.div)
 				document.body.appendChild(this.front.footer2.div)
 				document.body.appendChild(this.front.coins.div)
@@ -154,6 +161,13 @@ class Asteroid {
 					obj.style.left = '50%'
 					obj.style.fontSize = '2rem'
 					obj.style.transform = 'translateX(-50%)'
+				}
+				if (frontpart.type === 'subtitle') {
+					obj.style.top = '57%'
+					obj.style.left = '50%'
+					obj.style.fontSize = '1rem'
+					obj.style.transform = 'translateX(-50%)'
+					obj.style.backgroundColor = '#20202020'
 				}
 				if (frontpart.type === 'footer') {
 					obj.style.bottom = '15%'
@@ -201,7 +215,7 @@ class Asteroid {
 			},
 			addScore: (source) => {
 				let player = this.players.players[this.actualPlayer]
-				let ship = player.ships.ships[player.currentship]
+				// let ship = player.ships.ships[player.currentship]
 				if (source.pts > 0 && (player.score === 0 || player.score > 0)) {
 					player.score = player.score + parseInt(source.pts)
 					this.front['scorep' + (this.actualPlayer + 1)].div.textContent = parseInt(player.score)
@@ -386,10 +400,18 @@ class Asteroid {
 		stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
-		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;font-size: 1rem;color: white;}'
+		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;}'
 		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
 		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
 		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.title {font-size: calc((100vw /100)*2.5 ) !important}'
+		stringcss += '#devconsole {font-size: min(calc((100vh /100)*1.6 ), 1rem) !important}'
+		stringcss += '.subtitle {font-size: calc((100vw /100)*1.7 ) !important}'
+		stringcss += '.shoot {font-size: calc((100vw /100)*1.7 ) !important}'
+		stringcss += '.footer {font-size: calc((100vh /100)*1.4 ) !important}'
+		stringcss += '.footer2 {font-size: calc((100vh /100)*1.2 ) !important}'
+		stringcss += '.scorep1,.scorep2 {font-size: calc((100vh /100)*1.1 ) !important}'
+		stringcss += '.coins {font-size: calc((100vh /100)*1.1 ) !important}'
 
 		this.addCss(stringcss, 'main')
 	}
@@ -433,10 +455,10 @@ class Asteroid {
 		if (!this.isPause) {
 			// PROJECTILS
 			this.projectils.renderProjectils()
-			// ASTEROIDS
-			this.asteroids.renderAsteroids()
 			// PLAYERS
 			this.players.renderPlayer()
+			// ASTEROIDS
+			this.asteroids.renderAsteroids()
 		}
 	}
 	starsManager = () => {
@@ -657,7 +679,7 @@ class Asteroid {
 						d: this.aleaEntreBornes(1, 360),
 						range: { x: 32, y: 32, z: 32 }, // range 
 						pts: 100,
-						lv: this.aleaEntreBornes(1, 3),
+						lv: 1,//this.aleaEntreBornes(1, 3),
 						div: Object,
 						nearest: false
 					}
@@ -698,7 +720,14 @@ class Asteroid {
 					this.projectils.projectils.forEach(projectil => {
 						let distance = this.getDistance(asteroid, projectil);
 						if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
+
 							asteroid.explode = true
+							asteroid.div.classList.add('unarmed')
+							asteroid.div.textContent = "BOOM"
+
+
+							console.log('dead asteroid immat:' + asteroid.immat)
+
 
 							this.front.addScore(asteroid)
 							this.projectils.addToDeletation(projectil)
@@ -720,23 +749,22 @@ class Asteroid {
 				let alertedistancebeforecolliding = 30 // pixels
 				let deadrange = ((ship.w / 2) + (asteroid.w / 2))
 				let alerterange = deadrange + alertedistancebeforecolliding
-				if (!asteroid.unarmed) {
-					// alerte distance
-					if ((distance) < alerterange) {
-						ship.div.classList.add('alerte')
-					}
-					else {
-						ship.div.classList.remove('alerte')
-					}
-					// colliding
-					if (distance < deadrange) {
-						// this.projectils.addToDeletation(projectil)
-						asteroid.unarmed = true
-						asteroid.div.classList.add('unarmed')
-						asteroid.div.textContent = "BOOM"
-						// ship.div.classList.add('unarmed')
-					}
+				// if (!asteroid.explode) {
+				// alerte distance
+				if ((distance) < alerterange) {
+					ship.div.classList.add('alerte')
 				}
+				else {
+					ship.div.classList.remove('alerte')
+				}
+				// colliding
+				if (distance < deadrange) {
+					console.log('dead asteroid immat:' + asteroid.immat)
+					this.asteroids.addToDeletation(asteroid)
+				}
+				// delete asteroids from array
+				this.asteroids.DeleteAsteroids()
+				// }
 			},
 			addToDeletation: (asteroid) => {
 				this.asteroids.asteroidstodelete.push(asteroid)
@@ -745,13 +773,12 @@ class Asteroid {
 				// delete asteroids
 				if (this.asteroids.asteroidstodelete.length > 0) {
 					this.asteroids.asteroidstodelete.forEach(asteroid => {
-						asteroid.div.classList.add('unarmed')
-						asteroid.div.textContent = "BOOM"
 						asteroid.div.style.backgroundColor = 'white'
 						let nb = 0
 						let asteroidtodelete = false
 						this.asteroids.asteroids.forEach(element => {
 							if (element.immat === asteroid.immat) {
+								element.div.remove()
 								asteroidtodelete = nb
 							}
 							nb++
@@ -785,8 +812,10 @@ class Asteroid {
 					})
 
 					if (this.asteroids.asteroids[nearestAsteroidImmat]) {
+						console.log('nearest', this.asteroids.asteroids[nearestAsteroidImmat])
 						this.asteroids.asteroids[nearestAsteroidImmat].nearest = true
 						this.asteroids.asteroids[nearestAsteroidImmat].div.classList.add('nearest')
+
 						this.asteroids.check_collisions_ship(this.asteroids.asteroids[nearestAsteroidImmat])
 					}
 				}
@@ -979,6 +1008,20 @@ class Asteroid {
 			if (eventkeydown.key === "k") { ship.mods.preview('limit') }
 			if (eventkeydown.key === "v") { this.setVisualHelp() }
 		}
+		if (document.getElementById('devconsole')) {
+			document.getElementById('devconsole').addEventListener('click', (event) => {
+				this.setDisplayInfo()
+			})
+		}
+		window.addEventListener('resize', (event) => {
+			this.screenRatio = {
+				w: this.screen.w / window.innerWidth,
+				h: this.screen.h < window.innerHeight ? window.innerHeight / this.screen.h : this.screen.h / window.innerHeight,
+				l: (((this.screen.w + this.screen.h) / 2) + ((window.innerWidth + window.innerHeight) / 2) / 2) // 3d
+			}
+			this.center = { x: (window.innerWidth / 2), y: (window.innerHeight / 2), z: 0 }
+			this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
+		}, true)
 	}
 	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
@@ -1006,11 +1049,6 @@ class Asteroid {
 			this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
 		}, true)
 
-		if (document.getElementById('devconsole')) {
-			document.getElementById('devconsole').addEventListener('click', (event) => {
-				this.setDisplayInfo()
-			})
-		}
 	}
 	aleaEntreBornes(minimum, maximum) {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
