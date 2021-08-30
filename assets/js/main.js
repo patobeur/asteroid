@@ -837,6 +837,7 @@ class Asteroid {
 			if (eventkeydown.key === "ArrowUp") { player.ships.changespeed(eventkeydown.key) }
 			if (eventkeydown.key === "ArrowDown") { player.ships.changespeed(eventkeydown.key) }
 		}
+
 		window.addEventListener('resize', (event) => {
 			this.screenRatio = {
 				w: this.screen.w / window.innerWidth,
@@ -847,6 +848,12 @@ class Asteroid {
 			this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
 		}, true)
 
+		if (document.getElementById('devconsole')) {
+			console.log('ok')
+			document.getElementById('devconsole').addEventListener('click', (event) => {
+				this.setDisplayInfo()
+			})
+		}
 	}
 	aleaEntreBornes(minimum, maximum) {
 		return Math.floor(Math.random() * (maximum - minimum + 1)) + minimum
