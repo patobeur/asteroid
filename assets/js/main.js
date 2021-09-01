@@ -10,6 +10,9 @@ class Asteroid {
 		this.actualPlayer = 0;
 		this.maxPlayer = 2;
 		this.coins = 0;
+		this.gameRender = false
+		this.wait = false
+		this.shipList = 0
 		// -- 
 		// Modal principal
 		this.front = this.FrontManager()
@@ -22,12 +25,11 @@ class Asteroid {
 		// --
 		this.front.create()
 		this.players = this.playersManager()
-		this.stars = this.starsManager() // not really needed
+		// this.stars = this.starsManager() // not really needed
 		this.projectils = this.projectilsManager()
 		this.asteroids = this.asteroidsManager()
 		this.createAndAddCss()
 		this.addEventKeyHelp()
-		// this.startGame()
 	}
 	FrontManager = () => {
 		let front = {
@@ -61,6 +63,11 @@ class Asteroid {
 				type: 'right',
 				div: Object
 			},
+			titlebloc: {
+				content: '',
+				type: 'titlebloc',
+				div: Object
+			},
 			title: {
 				content: 'Asteroid',
 				type: 'title',
@@ -77,7 +84,7 @@ class Asteroid {
 				div: Object
 			},
 			footer2: {
-				content: 'asteroids by PatAtari',
+				content: 'asteroids by Patobeur',
 				type: 'footer2',
 				div: Object
 			},
@@ -139,13 +146,19 @@ class Asteroid {
 				document.body.appendChild(this.front.scorep2.div)
 			},
 			createInfo: () => {
+				this.front.titlebloc.div = this.front.divMaker(this.front.titlebloc)
 				this.front.title.div = this.front.divMaker(this.front.title)
 				this.front.subtitle.div = this.front.divMaker(this.front.subtitle)
 				this.front.footer.div = this.front.divMaker(this.front.footer)
 				this.front.footer2.div = this.front.divMaker(this.front.footer2)
 				this.front.coins.div = this.front.divMaker(this.front.coins)
-				document.body.appendChild(this.front.title.div)
-				document.body.appendChild(this.front.subtitle.div)
+
+				this.front.titlebloc.div.appendChild(this.front.title.div)
+				this.front.titlebloc.div.appendChild(this.front.subtitle.div)
+				document.body.appendChild(this.front.titlebloc.div)
+
+				// document.body.appendChild(this.front.title.div)
+				// document.body.appendChild(this.front.subtitle.div)
 				document.body.appendChild(this.front.footer.div)
 				document.body.appendChild(this.front.footer2.div)
 				document.body.appendChild(this.front.coins.div)
@@ -154,20 +167,22 @@ class Asteroid {
 				let obj = document.createElement("div")
 				obj.className = frontpart.type
 				obj.textContent = frontpart.content
-				// obj.style.color = 'white'
 				obj.style.position = 'absolute'
-				if (frontpart.type === 'title') {
+				if (frontpart.type === 'titlebloc') {
 					obj.style.top = '50%'
 					obj.style.left = '50%'
-					obj.style.fontSize = '2rem'
-					obj.style.transform = 'translateX(-50%)'
+					obj.style.display = 'flex'
+					obj.style.flexDirection = 'column'
+					obj.style.justifyContent = 'center'
+					obj.style.alignItems = 'center'
+					obj.style.transform = 'translate(-50%,-50%)'
+				}
+				if (frontpart.type === 'title') {
+					obj.style.position = 'relative'
 				}
 				if (frontpart.type === 'subtitle') {
-					obj.style.top = '57%'
-					obj.style.left = '50%'
-					obj.style.fontSize = '1rem'
-					obj.style.transform = 'translateX(-50%)'
-					obj.style.backgroundColor = '#20202020'
+					obj.style.position = 'relative'
+					obj.style.backgroundColor = '#20FF2020'
 				}
 				if (frontpart.type === 'footer') {
 					obj.style.bottom = '15%'
@@ -177,23 +192,19 @@ class Asteroid {
 				if (frontpart.type === 'footer2') {
 					obj.style.bottom = '2%'
 					obj.style.left = '50%'
-					obj.style.fontSize = '.5rem'
 					obj.style.transform = 'translate(-50%, -50%)'
 				}
 				if (frontpart.type === 'scorep1') {
-					obj.style.top = '15%'
+					obj.style.top = '5%'
 					obj.style.left = '25%'
-					// obj.style.transform = 'translate(-50%, -50%)'
 				}
 				if (frontpart.type === 'scorep2') {
-					obj.style.top = '15%'
+					obj.style.top = '5%'
 					obj.style.right = '25%'
-					// obj.style.transform = 'translate(-50%, -50%)'
 				}
 				if (frontpart.type === 'coins') {
-					obj.style.top = '20%'
+					obj.style.top = '8%'
 					obj.style.left = '50%'
-					obj.style.fontSize = '.7rem'
 					obj.style.transform = 'translateX(-50%)'
 				}
 				return obj;
@@ -203,29 +214,31 @@ class Asteroid {
 				this.front.coins.div.textContent = this.coins
 			},
 			removeinfo: () => {
-				this.front.title.div.remove()
-				this.front.subtitle.div.remove()
+				this.front.titlebloc.div.remove()
+				// this.front.subtitle.div.remove()
 				this.front.footer.div.remove()
 				this.front.footer2.div.remove()
 				this.front.coins.div.remove()
 			},
 			removeTouch: () => {
+				this.front.up.div.remove()
+				this.front.down.div.remove()
 				this.front.left.div.remove()
 				this.front.right.div.remove()
 				this.front.shoot.div.remove()
 			},
 			addScore: (source) => {
+				console.log('add ' + parseInt(source.pts) + 'pts to : player ' + this.actualPlayer)
 				let player = this.players.players[this.actualPlayer]
-				// let ship = player.ships.ships[player.currentship]
 				if (source.pts > 0 && (player.score === 0 || player.score > 0)) {
 					player.score = player.score + parseInt(source.pts)
-					this.front['scorep' + (this.actualPlayer + 1)].div.textContent = parseInt(player.score)
+					let targetScore = 'scorep' + (this.actualPlayer + 1)
+					this.front[targetScore].div.textContent = parseInt(player.score)
 				}
 			},
 			checkfront: (source) => {
-				// let ship = player.ships.ships[player.currentship]
 				if (this.actualPlayer) {
-					console.log(source)
+					console.log('checkfront:' + source)
 				}
 			}
 		}
@@ -260,6 +273,8 @@ class Asteroid {
 			visual.style.justifyContent = 'center'
 			visual.style.alignItems = 'center'
 			visual.style.borderRadius = '50%'
+			visual.textContent = item.immat
+			visual.style.fontSize = ".5rem"
 
 			let range = document.createElement('div')
 			range.className = type + ' range'
@@ -389,30 +404,37 @@ class Asteroid {
 		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;color:white;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
-		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 0;}'
+		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 1;}'
 		stringcss += '.asteroid.nearest {background-Color:green}'
 		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
-		stringcss += '.ship {background-color:#474350}'
+
+		stringcss += '.ship {opacity: 1; animation: .3s linear init;}'
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
+		stringcss += '.ship.explode {background-color:none;animation: 3s linear explode;opacity: 0;}'
+		stringcss += '@keyframes explode {from {transform: scale(1) rotate(-360deg);opacity: 1;}to {top:50%;left:50%;transform: scale(18) rotate(360deg);opacity: 0;animation-play-state: paused;}}'
+
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
 		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;}'
 		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
 		stringcss += '#devconsole.active .devplayer,#devconsole.active .devship {display:unset}'
 		stringcss += '#devmire {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3Csvg version=\'1.0\' id=\'mire\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 256 256\' style=\'enable-background:new 0 0 256 256;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E .st0%7Bfill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-miterlimit:10;%7D%0A%3C/style%3E%3Cline id=\'x\' class=\'st0\' x1=\'128\' y1=\'9.5\' x2=\'128\' y2=\'246.5\'/%3E%3Cline id=\'y\' class=\'st0\' x1=\'246.5\' y1=\'128\' x2=\'9.5\' y2=\'128\'/%3E%3C/svg%3E");background-size: 256px;background-repeat: no-repeat;background-position: center;width: 256px;height: 256px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.title {font-size: calc((100vw /100)*2.5 ) !important}'
-		stringcss += '#devconsole {font-size: min(calc((100vh /100)*1.6 ), 1rem) !important}'
-		stringcss += '.subtitle {font-size: calc((100vw /100)*1.7 ) !important}'
-		stringcss += '.shoot {font-size: calc((100vw /100)*1.7 ) !important}'
-		stringcss += '.footer {font-size: calc((100vh /100)*1.4 ) !important}'
-		stringcss += '.footer2 {font-size: calc((100vh /100)*1.2 ) !important}'
-		stringcss += '.scorep1,.scorep2 {font-size: calc((100vh /100)*1.1 ) !important}'
-		stringcss += '.coins {font-size: calc((100vh /100)*1.1 ) !important}'
+		stringcss += '#devconsole {font-size: min(calc((100vh /100)*1.6 ), 1rem) }'
+		stringcss += '.titlebloc {font-size: max(2rem, calc((100vw /100)*3 ))}'
+		stringcss += '.subtitle {font-size: max(1rem, calc((100vw /100)*1.5 ))}'
+
+		stringcss += '.shoot {font-size: calc((100vw /100)*1.7 )}'
+		stringcss += '.footer {font-size: calc((100vh /100)*1.4 )}'
+		stringcss += '.footer2 {font-size: min(.5rem, calc((100vw /100)*1.2 ))}'
+		stringcss += '.scorep1,.scorep2 {font-size: calc((100vh /100)*1.1 )}'
+		stringcss += '.coins {font-size: calc((100vh /100)*1.1 )}'
+		stringcss += '.shoot,.footer,.footer2,.coins,.scorep1,.scorep2,.titlebloc {opacity: 1; animation: 1s linear init;}'
+
 
 		this.addCss(stringcss, 'main')
 	}
@@ -424,97 +446,109 @@ class Asteroid {
 	}
 	startGame = (nbplayer = false) => {
 		if (nbplayer) {
-			if (nbplayer === 1) {
 
-			}
-			else if (nbplayer === 2) {
-
-			}
-
-			// cosmos
-			// this.cosmos.addtodom()
 			this.front.removeinfo()
 			this.front.createTouch()
+
 			// STARS ?? REALY NOT NEEDED
-			if (this.stars) {
-				this.stars.create()
-				this.stars.add()
-			}
+			// if (this.stars) {
+			// 	this.stars.create()
+			// 	this.stars.add()
+			// }
 
 			// PLAYERS
-			this.players.create()
-			this.players.players[this.actualPlayer].ships.addtodom()
-			// ASTEROIDS
-			this.asteroids.create()
-
-			//RENDER 
-			setInterval(() => { this.render() }, this.renderInterval);
-			this.addEventKey()
+			if (nbplayer === 1) {
+				this.players.create()
+			}
+			else if (nbplayer === 2) {
+				this.players.create()
+				this.players.create()
+			}
+			this.keepPlaying()
 		}
 	}
+	keepPlaying = () => {
+		// ASTEROIDS
+
+		//RENDER addship
+		this.players.players[this.actualPlayer].ships.addship(this.players.players[this.actualPlayer])
+		this.players.players[this.actualPlayer].ships.addtodom()
+		// this.setPause()
+		//RENDER 
+		// this.gameRender = (() => { this.render() }, this.renderInterval);
+		this.gameRender = setInterval(() => { this.render() }, this.renderInterval);
+
+		// ASTEROIDS
+		this.asteroids.create(this.players.players[this.actualPlayer].lv)
+		this.addEventKey()
+	}
 	render = () => {
-		if (!this.isPause) {
+		if (!this.isPause && !this.wait) {
+			// ASTEROIDS
+			this.asteroids.renderAsteroids()
 			// PROJECTILS
 			this.projectils.renderProjectils()
 			// PLAYERS
 			this.players.renderPlayer()
-			// ASTEROIDS
-			this.asteroids.renderAsteroids()
 		}
 	}
-	starsManager = () => {
-		let datas = {
-			stars: [],
-			add: () => {
-				for (let index = 0; index < this.stars.stars.length; index++) {
-					this.stars.stars[index].div = this.divMaker('star', this.stars.stars[index]);
-					this.stars.addtodom(this.stars.stars[index])
-				}
-			},
-			addtodom: (star) => {
-				document.body.appendChild(star.div)
-			},
-			create: () => {
-				let immat = this.stars.stars.lenght ?? 0
-				this.stars.stars.push({
-					immat: immat,
-					type: 'star',
-					visual: '🌟',//🧭
-					x: this.center.x,
-					y: this.center.y,
-					z: this.center.z, // 3d
-					w: 48,
-					h: 48,
-					l: 48, // 3d
-					orbitdelay: [0, 50], // current,orbit refreh delay 
-					range: { x: 100, y: 100, z: 100 }, // range of orbit effect in pixels
-					div: Object
-				})
-			}
-		}
-		return datas
+	giveDelay = (time) => {
+		return new Promise(resolve => setTimeout(resolve, time));
 	}
+	// starsManager = () => {
+	// 	let datas = {
+	// 		stars: [],
+	// 		add: () => {
+	// 			for (let index = 0; index < this.stars.stars.length; index++) {
+	// 				this.stars.stars[index].div = this.divMaker('star', this.stars.stars[index]);
+	// 				this.stars.addtodom(this.stars.stars[index])
+	// 			}
+	// 		},
+	// 		addtodom: (star) => {
+	// 			document.body.appendChild(star.div)
+	// 		},
+	// 		create: () => {
+	// 			let immat = this.stars.stars.length ?? 0
+	// 			this.stars.stars.push({
+	// 				immat: immat,
+	// 				type: 'star',
+	// 				visual: '🌟',//🧭
+	// 				x: this.center.x,
+	// 				y: this.center.y,
+	// 				z: this.center.z, // 3d
+	// 				w: 48,
+	// 				h: 48,
+	// 				l: 48, // 3d
+	// 				orbitdelay: [0, 50], // current,orbit refreh delay 
+	// 				range: { x: 100, y: 100, z: 100 }, // range of orbit effect in pixels
+	// 				div: Object
+	// 			})
+	// 		}
+	// 	}
+	// 	return datas
+	// }
 	playersManager = () => {
 		let datas = {
 			players: [],
 			create: () => {
-				let immat = this.players.players.lenght ?? 0
+				let immat = (this.players.players.length > 0) ? this.players.players.length : 0
 				let newplayer = {
 					immat: immat,
 					score: 0,
 					lifetime: 0,
 					gameover: 0,
-					lives: 0,
+					lives: 3,
 					lv: 0,
 					dir: { right: 0, left: 0, up: 0, down: 0 }, // right, left (arrows keys downned)
 					type: 'ship',
-					ships: this.shipsManager('ship'),
+					ships: this.shipsManager('ship', immat),
+					ship: Object,
 					currentship: 0,
 					resetdir: (player) => {
 						player.dir = { right: 0, left: 0 }
 					},
 					checkdir: (player) => {
-						let currentship = player.ships.ships[player.currentship]
+						let currentship = player.ship
 						currentship.d += player.dir.right === 1 ? currentship.dstep : 0;
 						currentship.d -= player.dir.left === 1 ? currentship.dstep : 0;
 
@@ -545,34 +579,116 @@ class Asteroid {
 					},
 				}
 				this.players.players.push(newplayer)
-				this.players.players[immat].ships.addship(this.players.players[immat])
+				// this.players.players[immat].ships.addship(this.players.players[immat])
+			},
+			death: () => {
+				let player = this.players.players[this.actualPlayer]
+				this.players.players[this.actualPlayer].lives -= 1
+				let ship = player.ship
+				this.wait = true
+				clearInterval(this.gameRender);
+				ship.div.classList.remove('alerte')
+				ship.div.classList.add('explode')
+				this.asteroids.clearAsteroids()
+
+
+				this.giveDelay(3000).then(() => {
+					let player = this.players.players[this.actualPlayer]
+					let ship = player.ship
+					ship.div.remove()
+
+					let nextplayerimmat = this.players.getNextPlayerWithLives()
+
+					console.log('nextplayerimmat')
+					console.log(nextplayerimmat)
+					if (nextplayerimmat === false) {
+						console.log('game OVERRRRRRRRRRRRR:')
+					}
+					else {
+						console.log('nextplayerimmat:' + nextplayerimmat)
+						this.actualPlayer = nextplayerimmat
+					}
+					console.log('next:' + nextplayerimmat)
+					console.log('giveDelay this.actualPlayer :' + this.actualPlayer + ' died')
+					console.log('giveDelay player.immat :' + player.immat)
+					console.log('giveDelay player.lives:' + player.lives)
+
+					// // test if more than 1 player
+					// if (this.players.players.length > 1) {
+					// 	this.actualPlayer += 1;
+					// 	if (this.actualPlayer >= this.maxPlayer) {
+					// 		this.actualPlayer = 0
+					// 	}
+					// }
+					// player = this.players.players[this.actualPlayer]
+					// ship = player.ship
+					// // test player lives
+					// if (this.players.players[this.actualPlayer].lives > 0) {
+					// 	player = this.players.players[this.actualPlayer]
+					// 	console.log(player)
+					// }
+					// else {
+					// 	// gam over this player
+					// 	console.log('--------------------game over this player')
+					// 	player.gameover = true
+					// 	this.wait = true
+					// }
+
+					this.wait = false
+					this.keepPlaying()
+				});
+			},
+			getNextPlayerWithLives: () => {
+				let nblivespositiv = 0
+				let nbreponse = 0
+				let stop = false
+				this.players.players.forEach(player => {
+					if (player.lives > 0) { nblivespositiv++ }
+					if (player.lives > 0 && stop != true) {
+						stop = true
+						console.log('--------------------------------------lives:' + player.lives)
+						console.log('----------------------------------------player.immat:' + player.immat)
+
+						if (player.immat > this.actualPlayer) {
+							nbreponse++
+							console.log(player.immat, this.actualPlayer, player.lives)
+						}
+					}
+				});
+				if (nbreponse > 0) {
+					return nbreponse
+				}
+				else {
+					if (nblivespositiv > 0) {
+						this.players.players.forEach(player => {
+							if (player.lives > 0) {
+								return player.immat
+							}
+						})
+						return false
+					}
+					else {
+						return false
+					}
+				}
 			},
 			renderPlayer: () => {
-				if (this.players.players[0]) {
-					this.players.players.forEach(player => {
-						if (player.ships.ships[player.currentship]) {
-							// player.ships.ships.forEach(ship => {
-							if (player.ships.ships[player.currentship].mods) {
-
-								player.ships.shootRefreshDelay(player, player.ships.ships[player.currentship])
-								player.checkdir(player)
-								this.players.check_PlayerMoves(player)
-								this.players.check_ShipPos(player)
-								this.players.update_ShipDivPos(player)
-								this.devTools.refreshconsole(player)
-							}
-							else {
-								this.devTools.setBugAndPause('no ships define')
-							}
-							// });
-						}
-						else this.devTools.setBugAndPause('no ships mods define')
-					});
+				let player = this.players.players[this.actualPlayer]
+				if (player.ship) {
+					if (player.ship.mods) {
+						player.ships.shootRefreshDelay(player, player.ship)
+						player.checkdir(player)
+						this.players.check_PlayerMoves(player)
+						this.players.check_ShipPos(player)
+						this.players.update_ShipDivPos(player)
+						this.devTools.refreshconsole(player)
+					}
+					else this.devTools.setBugAndPause('ship have no mods define');
 				}
-				else this.devTools.setBugAndPause('no player define')
+				else this.devTools.setBugAndPause('no ships define');
 			},
 			check_ShipPos: (player) => { // check out screen position
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				if (ship.mods.moves[ship.mods.move] != 'orbit') {
 					if (ship.x > (this.screen.w + (ship.w / 2))) { ship.x = 1 }
 					if (ship.y > (this.screen.h + (ship.h / 2))) { ship.y = 1 }
@@ -583,7 +699,7 @@ class Asteroid {
 				}
 			},
 			update_ShipDivPos: (player) => {
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				ship.div.style.left = ((ship.x - (ship.w / 2))) + 'px'
 				ship.div.style.top = ((ship.y - (ship.h / 2))) + 'px'
 				ship.div.style.zIndex = ((ship.z - (ship.l / 2))) // 3d
@@ -593,7 +709,7 @@ class Asteroid {
 				ship.div.style.transform = 'rotate(' + (ship.d + 90) + 'deg)'
 			},
 			check_PlayerMoves: (player) => {
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				// let distance = this.getDistance(player,star)
 				let x = ship.x
 				let y = ship.y
@@ -660,6 +776,7 @@ class Asteroid {
 	}
 	asteroidsManager = () => {
 		let data = {
+			kills: 0,
 			asteroids: [],
 			asteroidstodelete: [],
 			max: 8,
@@ -695,6 +812,45 @@ class Asteroid {
 			addtodom: (asteroid) => {
 				document.body.appendChild(asteroid.div)
 			},
+			renderAsteroids: () => {
+				// let nearestAsteroidImmat = false
+				let asteroidIndex = false
+				let smallestDistance = 999999
+				let asteroidkey = 0
+				let player = this.players.players[this.actualPlayer]
+				let ship = player.ship
+				if (this.asteroids.asteroids.length > 0 && !this.isPause) {
+
+					//-- forEach asteroid
+					this.asteroids.asteroids.forEach(asteroid => {
+						// get nearest asteroid from ship
+						asteroid.div.classList.remove('nearest')
+						ship.div.classList.remove('alerte')
+						asteroid.nearest = false
+						ship.alerte = false
+						let distance = this.getDistance(asteroid, ship)
+						if (distance < smallestDistance) {
+							smallestDistance = distance
+							// nearestAsteroidImmat = asteroid.immat
+							asteroidIndex = asteroidkey
+						}
+						// check collision in case any projectils exist
+						if (this.projectils.projectils.length > 0) {
+							this.asteroids.check_collisions_projectils(asteroidkey)
+						}
+						// update div pos
+						this.asteroids.update_DivPos(asteroid)
+						asteroidkey++
+					})
+				}
+				//  if nearest asteroid still exist
+				if (asteroidIndex >= 0 && this.asteroids.asteroids[asteroidIndex]) {
+					this.asteroids.asteroids[asteroidIndex].nearest = true
+					this.asteroids.asteroids[asteroidIndex].div.classList.add('nearest')
+					this.asteroids.check_collisions_ship(asteroidIndex)
+					asteroidIndex = false
+				}
+			},
 			update_DivPos: (asteroid) => {
 				this.asteroids.check_ElementPos(asteroid)
 				asteroid.x = asteroid.x + (asteroid.speed * Math.cos((asteroid.d) * (Math.PI / 180)))
@@ -713,114 +869,88 @@ class Asteroid {
 				if (asteroid.y < (0 - (asteroid.h / 2))) { asteroid.y = this.screen.h - 1 }
 				if (asteroid.z < (0 - (asteroid.l / 2))) { asteroid.z = this.screen.h - 1 } // 3d
 			},
-			check_collisions_projectils: (asteroid) => {
+			check_collisions_projectils: (asteroidkey) => {
+				let asteroid = this.asteroids.asteroids[asteroidkey]
 				// 💡 an idea to make it better ???
 				// collision is true if distance from objects centers is less than both half width's objects summed
 				// CHECK COLLiSION with projectils
-				if (this.projectils.projectils[0]) {
+				if (this.projectils.projectils.length > 0) {
+					let projectilIndex = 0
 					this.projectils.projectils.forEach(projectil => {
 						let distance = this.getDistance(asteroid, projectil);
 						if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
-
 							asteroid.explode = true
 							asteroid.div.classList.add('unarmed')
 							asteroid.div.textContent = "BOOM"
 
 
-							console.log('dead asteroid immat:' + asteroid.immat)
+							// console.log('dead asteroid immat:' + asteroid.immat)
 
 
 							this.front.addScore(asteroid)
-							this.projectils.addToDeletation(projectil)
-							this.asteroids.addToDeletation(asteroid)
+							this.projectils.addToDeleteList(projectilIndex)
+							this.asteroids.addToDeleteList(asteroidkey)
 						}
 						// delete asteroids from array
-						this.asteroids.DeleteAsteroids()
+						this.asteroids.clearDeleteList()
+						projectilIndex++
 					})
 				}
 
 			},
-			check_collisions_ship: (asteroid) => {
-				// 💡 an idea to make it better ???
-				// collision is true if distance from objects centers is less than both half width's objects summed
-				// if (!asteroid.unarmed) {
-				// CHECK COLLiSION with player ship
-				let ship = this.players.players[this.actualPlayer].ships.ships[this.players.players[this.actualPlayer].currentship]
+			check_collisions_ship: (asteroidIndex) => {
+				let asteroid = this.asteroids.asteroids[asteroidIndex]
+				let player = this.players.players[this.actualPlayer]
+				let ship = player.ship
+				// console.log()
 				let distance = this.getDistance(asteroid, ship);
-				let alertedistancebeforecolliding = 30 // pixels
+				let alertedistancebeforecolliding = 20 // pixels
 				let deadrange = ((ship.w / 2) + (asteroid.w / 2))
 				let alerterange = deadrange + alertedistancebeforecolliding
+
+
+
 				// if (!asteroid.explode) {
 				// alerte distance
+
 				if ((distance) < alerterange) {
 					ship.div.classList.add('alerte')
+					// console.log('alerte:' + asteroid.immat)
 				}
 				else {
 					ship.div.classList.remove('alerte')
 				}
 				// colliding
 				if (distance < deadrange) {
-					console.log('dead asteroid immat:' + asteroid.immat)
-					this.asteroids.addToDeletation(asteroid)
+					console.log(' 1 -----------')
+					console.log('normal death')
+					console.log('distance < deadrange')
+					console.log(distance, deadrange)
+					console.log(asteroid, ship)
+					this.players.death(asteroidIndex)
+					// this.asteroids.addToDeleteList(asteroidIndex)
 				}
 				// delete asteroids from array
-				this.asteroids.DeleteAsteroids()
+				// this.asteroids.clearDeleteList()
 				// }
 			},
-			addToDeletation: (asteroid) => {
-				this.asteroids.asteroidstodelete.push(asteroid)
+			addToDeleteList: (asteroidIndex) => {
+				this.asteroids.asteroidstodelete.push(asteroidIndex)
 			},
-			DeleteAsteroids: () => {
+			clearDeleteList: () => {
 				// delete asteroids
 				if (this.asteroids.asteroidstodelete.length > 0) {
-					this.asteroids.asteroidstodelete.forEach(asteroid => {
-						asteroid.div.style.backgroundColor = 'white'
-						let nb = 0
-						let asteroidtodelete = false
-						this.asteroids.asteroids.forEach(element => {
-							if (element.immat === asteroid.immat) {
-								element.div.remove()
-								asteroidtodelete = nb
-							}
-							nb++
-						});
-						this.asteroids.asteroids.splice(asteroidtodelete, 1);
+					this.asteroids.asteroidstodelete.forEach(asteroidIndex => {
+						this.asteroids.asteroids[asteroidIndex].div.remove()
+						this.asteroids.asteroids.splice(asteroidIndex, 1);
 					})
 					this.asteroids.asteroidstodelete = []
 				}
 			},
-			renderAsteroids: () => {
-				let nearestAsteroidImmat = false
-				let smallestDistance = 999999
-				let player = this.players.players[this.actualPlayer]
-				let ship = player.ships.ships[player.currentship]
-				if (this.asteroids.asteroids.length > 0 && !this.isPause) {
-
-					//-- forEach asteroid
-					this.asteroids.asteroids.forEach(asteroid => {
-						this.asteroids.update_DivPos(asteroid)
-
-
-						// get nearest asteroid from ship
-						asteroid.div.classList.remove('nearest')
-						asteroid.nearest = false
-						let distance = this.getDistance(asteroid, ship)
-						if (distance < smallestDistance) {
-							smallestDistance = distance
-							nearestAsteroidImmat = asteroid.immat
-						}
-						this.asteroids.check_collisions_projectils(asteroid)
-					})
-
-					if (this.asteroids.asteroids[nearestAsteroidImmat]) {
-						console.log('nearest', this.asteroids.asteroids[nearestAsteroidImmat])
-						this.asteroids.asteroids[nearestAsteroidImmat].nearest = true
-						this.asteroids.asteroids[nearestAsteroidImmat].div.classList.add('nearest')
-
-						this.asteroids.check_collisions_ship(this.asteroids.asteroids[nearestAsteroidImmat])
-					}
-				}
-			},
+			clearAsteroids: () => {
+				this.asteroids.asteroids.forEach(element => { element.div.remove() });
+				this.asteroids.asteroids = []
+			}
 		}
 		return data
 	}
@@ -840,7 +970,7 @@ class Asteroid {
 			},
 			create: (type, player) => {
 				let immat = this.projectils.projectils.length
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				let projectil = {
 					immat: immat,
 					playerimmat: player.immat,
@@ -869,53 +999,62 @@ class Asteroid {
 				projectil.div.style.zIndex = parseInt((projectil.z - (projectil.l / 2))) // dreamming to make this 3d
 				projectil.div.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
 			},
-			addToDeletation: (projectil) => {
+			addToDeleteList: (projectilIndex) => {
+
+				let projectil = this.projectils.projectils[projectilIndex]
 				projectil.div.remove()
-				this.projectils.projectilstodelete.push(projectil)
+				this.projectils.projectilstodelete.push(projectilIndex)
 			},
-			DeleteProjectils: () => {
+			clearDeleteList: () => {
 				// delete projectil
 				if (this.projectils.projectilstodelete.length > 0) {
-					this.projectils.projectilstodelete.forEach(projectil => {
-						this.projectils.projectils.splice(projectil, 1);
+					this.projectils.projectilstodelete.forEach(projectilIndex => {
+						this.projectils.projectils.splice(projectilIndex, 1);
 					})
 					this.projectils.projectilstodelete = []
 				}
 			},
 			renderProjectils: () => {
 				if (this.projectils.projectils.length > 0) {
+					let projectilIndex = 0
 					this.projectils.projectils.forEach(projectil => {
 						if (projectil.lifedelay.current <= projectil.lifedelay.max) {
 							this.projectils.update_DivPos(projectil)
 							projectil.lifedelay.current += 1
 						}
 						else {
-							this.projectils.addToDeletation(projectil)
+							this.projectils.addToDeleteList(projectilIndex)
 						}
+						projectilIndex++
 					});
 					// delete projectil
-					this.projectils.DeleteProjectils()
+					this.projectils.clearDeleteList()
 				}
 			}
 		}
 		return data;
 	}
-	shipsManager(type = false) {
+	shipsManager(type = false, playerimmat) {
 		let data = {
+			ship: Object,
 			ships: [],
 			type: type ?? 'ship',
 			addship: (player) => {
-				player.ships.ships.push(player.ships.getnewship(player))
+				let newship = player.ships.getnewship(player)
+				player.ship = newship
+				// player.ships.ships.push(newship)
+				console.log('newship', newship)
 			},
 			addtodom: () => {
 				// this.players.players[this.actualPlayer].ship.div.textContent = this.players.players[this.actualPlayer].ship.visual
+				// let player = this.players.players[playerimmat]
 				let player = this.players.players[this.actualPlayer]
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				document.body.appendChild(ship.div)
 			},
 			changespeed: (dir) => {
 				let player = this.players.players[this.actualPlayer]
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				switch (dir) {
 					case 'ArrowUp':
 						ship.speed += ship.speed < ship.speedrange.max ? 1 : 0
@@ -929,8 +1068,6 @@ class Asteroid {
 				}
 			},
 			shootRefreshDelay: (player, ship) => {
-				// let player = this.players.players[this.actualPlayer]
-				// let ship = player.ships.ships[player.currentship]
 				if (ship.delayshoot.current > 0) {
 					ship.delayshoot.current += 1
 				}
@@ -939,22 +1076,26 @@ class Asteroid {
 				}
 			},
 			shoot: (type) => {
-				let player = this.players.players[this.actualPlayer]
-				let ship = player.ships.ships[player.currentship]
-				if (ship.delayshoot.current < 1) {
-					ship.delayshoot.current = 1
-					this.projectils.create(type, player)
+				if (!this.isPause && !this.wait) {
+					let player = this.players.players[this.actualPlayer]
+					let ship = player.ship
+					if (ship.delayshoot.current < 1) {
+						ship.delayshoot.current = 1
+						this.projectils.create(type, player)
+					}
 				}
 			},
 			getnewship: (player) => {
 				player = this.players.players[player.immat]
-				let newshipimmat = player.ships.ships.length
+				this.shipList += 1
+				let newshipimmat = this.shipList
+				console.log('getnewship newshipimmat:' + newshipimmat)
 				let ship = {
 					type: 'ship',
 					immat: newshipimmat,
 					dstep: 15, // rotation steps for changedir()
-					d: 0,
-					speed: 1,
+					d: -90,
+					speed: 0,
 					speedrange: { min: -2, max: 20 },
 					x: this.center.x,
 					y: this.center.y,
@@ -963,6 +1104,7 @@ class Asteroid {
 					h: 16,
 					l: 8, // 3d
 					tetha: 0,
+					immunity: { active: true, delay: 0, maxdelay: 5000 },
 					delayshoot: { current: 0, max: 12 },
 					range: { x: 40, y: 40, z: 40 }, // range 
 					div: Object,
@@ -973,7 +1115,7 @@ class Asteroid {
 						moves: ['nogravity', 'polar', 'ia', 'orbit', 'normal'],
 						next: (modename) => { // l
 							let player = this.players.players[this.actualPlayer]
-							let ship = player.ships.ships[player.currentship]
+							let ship = player.ship
 							ship.mods[modename] =
 								ship.mods[modename] < ship.mods[modename + 's'].length - 1
 									? ship.mods[modename] += 1
@@ -982,7 +1124,7 @@ class Asteroid {
 						},
 						preview: (modename) => { // o key
 							let player = this.players.players[this.actualPlayer]
-							let ship = player.ships.ships[player.currentship]
+							let ship = player.ship
 							ship.mods[modename] =
 								ship.mods[modename] > 0
 									? ship.mods[modename] -= 1
@@ -1027,7 +1169,7 @@ class Asteroid {
 	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
 			let player = this.players.players[this.actualPlayer]
-			let ship = player.ships.ships[player.currentship]
+			let ship = player.ship
 
 			if (eventkeydown.key === "i") { this.setDisplayInfo() }
 			if (eventkeydown.key === "p") { this.setPause() }
@@ -1061,7 +1203,7 @@ class Asteroid {
 		this.isVisualHelp = !this.isVisualHelp
 		if (this.isVisualHelp) {
 			let visual = '.ship.range {border: 1px dotted rgba(0, 255, 0, 1);}'
-			visual += '.ship {background-color:greenyellow}'
+			visual += '.ship {}'
 			visual += '.asteroid.range {border: 1px dotted rgba(0, 255, 0, 1);}'
 			visual += '.projectil.range {background-color:rgba(0, 255, 0, 1);border: 1px dotted rgba(0, 255, 0, 1);}'
 			visual += '*,fill {color:yellow;}'
@@ -1088,7 +1230,7 @@ class Asteroid {
 	getDevTools = () => {
 		return {
 			refreshconsole: (player) => { // dev tools only // remove this if on prod
-				let ship = player.ships.ships[player.currentship]
+				let ship = player.ship
 				let nbAsteroids = this.asteroids.asteroids.length
 				let nbProjectils = this.projectils.projectils.length
 				if (document.getElementById('devconsole')) {
@@ -1102,6 +1244,7 @@ class Asteroid {
 					document.getElementById('devy').textContent = 'y:' + ship.y
 					document.getElementById('devz').textContent = 'z:' + ship.z
 					document.getElementById('devd').textContent = 'd:' + ship.d + '°'
+
 					document.getElementById('devspeed').textContent = 'speed:' + ship.speed
 					document.getElementById('devmove').textContent = 'move:' + ship.mods.move + " [" + ship.mods.moves[ship.mods.move] + ']'
 					document.getElementById('devlimit').textContent = 'limit:' + ship.mods.limit + " [" + ship.mods.limits[ship.mods.limit] + ']'
