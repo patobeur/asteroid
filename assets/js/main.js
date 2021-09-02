@@ -13,131 +13,71 @@ class Asteroid {
 		this.gameRender = false
 		this.wait = false
 		this.shipList = 0
+		this.rendertics = 0
 		// -- 
-		// Modal principal
-		this.front = this.FrontManager()
+		this.front = this.FrontManager() // Modal principal
 		// -- 
 		this.center = { x: (window.innerWidth / 2), y: (window.innerHeight / 2), z: 0 }
 		this.screen = { w: window.innerWidth, h: window.innerHeight, l: ((window.innerHeight + window.innerWidth) / 2) }
-		// this.screenRatio = {w:1,h:1,l:1}
-		// this.cosmos = this.cosmosManager()
 		this.devTools = this.getDevTools() // dev tools
 		// --
-		this.front.create()
+		this.front.starter()
 		this.players = this.playersManager()
-		// this.stars = this.starsManager() // not really needed
 		this.projectils = this.projectilsManager()
 		this.asteroids = this.asteroidsManager()
 		this.createAndAddCss()
 		this.addEventKeyHelp()
+		this.initLocalStorage()
 	}
 	FrontManager = () => {
 		let front = {
-			up: {
-				content: 'faster',
-				type: 'up',
-				div: Object
-			},
-			touch: {
-				content: '',
-				type: 'touch',
-				div: Object
-			},
-			down: {
-				content: 'Slower',
-				type: 'down',
-				div: Object
-			},
-			shoot: {
-				content: 'shoot',
-				type: 'shoot',
-				div: Object
-			},
-			left: {
-				content: 'Left',
-				type: 'left',
-				div: Object
-			},
-			right: {
-				content: 'Right',
-				type: 'right',
-				div: Object
-			},
-			titlebloc: {
-				content: '',
-				type: 'titlebloc',
-				div: Object
-			},
-			title: {
-				content: 'Asteroid',
-				type: 'title',
-				div: Object
-			},
-			subtitle: {
-				content: 'tribute',
-				type: 'subtitle',
-				div: Object
-			},
-			footer: {
-				content: '1 coin 1 play',
-				type: 'footer',
-				div: Object
-			},
-			footer2: {
-				content: 'asteroids by Patobeur',
-				type: 'footer2',
-				div: Object
-			},
-			scorep1: {
-				content: 0,
-				type: 'scorep1',
-				div: Object
-			},
-			scorep2: {
-				content: 0,
-				type: 'scorep2',
-				div: Object
-			},
-			coins: {
-				content: 0,
-				type: 'coins',
-				div: Object
-			},
 			content: 0,
-			type: 'scorep2',
-			div: {
-				content: '',
-				type: 'touch',
-				div: Object
-			},
-			create: () => {
+			// type: 'scorep2',
+			div: { content: '', type: 'touch', div: Object },
+			up: { content: 'faster', type: 'up', div: Object },
+			touch: { content: '', type: 'touch', div: Object },
+			down: { content: 'Slower', type: 'down', div: Object },
+			shoot: { content: 'Shoot', type: 'shoot', div: Object },
+			left: { content: 'Left', type: 'left', div: Object },
+			right: { content: 'Right', type: 'right', div: Object },
+			titlebloc: { content: '', type: 'titlebloc', div: Object },
+			title: { content: 'Asteroid', type: 'title', div: Object },
+			subtitle: { content: 'tribute', type: 'subtitle', div: Object },
+			footer: { content: '1 coin 1 play', type: 'footer', div: Object },
+			footer2: { content: 'asteroids by Patobeur', type: 'footer2', div: Object },
+			scorep1: { content: 0, type: 'scorep1', div: Object },
+			scorep2: { content: 0, type: 'scorep2', div: Object },
+			coins: { content: 0, type: 'coins', div: Object },
+			nextplayer: { content: '', type: 'nextplayer', div: Object },
+			gameover: { content: 'gameover', type: 'gameover', div: Object },
+			starter: () => {
 				this.front.createScores()
-				this.front.createInfo()
+				this.front.createSplash()
 			},
 			createTouch: () => {
-				let player = this.players.players[this.actualPlayer]
 				this.front.up.div = this.front.divMaker(this.front.up)
 				this.front.down.div = this.front.divMaker(this.front.down)
 				this.front.left.div = this.front.divMaker(this.front.left)
 				this.front.right.div = this.front.divMaker(this.front.right)
 				this.front.shoot.div = this.front.divMaker(this.front.shoot)
-
+				// --
 				this.front.up.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].ships.changespeed('ArrowUp') })
 				this.front.down.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].ships.changespeed('ArrowDown') })
 				this.front.left.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].changedir('ArrowLeft') })
 				this.front.right.div.addEventListener('click', (e) => { this.players.players[this.actualPlayer].changedir('ArrowRight') })
 				this.front.shoot.div.addEventListener('click', () => { this.players.players[this.actualPlayer].ships.shoot('icecube') })
-
-
-
-				this.front.div = this.front.divMaker(this.front.div)
-				this.front.div.appendChild(this.front.up.div)
-				this.front.div.appendChild(this.front.down.div)
-				this.front.div.appendChild(this.front.left.div)
-				this.front.div.appendChild(this.front.right.div)
-
-				document.body.appendChild(this.front.div)
+				this.front.div.div = this.front.divMaker(this.front.div)
+				this.front.div.div.appendChild(this.front.up.div)
+				this.front.div.div.appendChild(this.front.down.div)
+				this.front.div.div.appendChild(this.front.left.div)
+				this.front.div.div.appendChild(this.front.right.div)
+				// --
+				document.body.appendChild(this.front.div.div)
 				document.body.appendChild(this.front.shoot.div)
+			},
+			removeTouch: () => {
+				this.front.div.div.remove()
+				this.front.shoot.div.remove()
 			},
 			createScores: () => {
 				this.front.scorep1.div = this.front.divMaker(this.front.scorep1)
@@ -145,20 +85,18 @@ class Asteroid {
 				document.body.appendChild(this.front.scorep1.div)
 				document.body.appendChild(this.front.scorep2.div)
 			},
-			createInfo: () => {
-				this.front.titlebloc.div = this.front.divMaker(this.front.titlebloc)
+			createSplash: () => {
 				this.front.title.div = this.front.divMaker(this.front.title)
 				this.front.subtitle.div = this.front.divMaker(this.front.subtitle)
-				this.front.footer.div = this.front.divMaker(this.front.footer)
-				this.front.footer2.div = this.front.divMaker(this.front.footer2)
-				this.front.coins.div = this.front.divMaker(this.front.coins)
-
+				// --
+				this.front.titlebloc.div = this.front.divMaker(this.front.titlebloc)
 				this.front.titlebloc.div.appendChild(this.front.title.div)
 				this.front.titlebloc.div.appendChild(this.front.subtitle.div)
 				document.body.appendChild(this.front.titlebloc.div)
-
-				// document.body.appendChild(this.front.title.div)
-				// document.body.appendChild(this.front.subtitle.div)
+				// --
+				this.front.footer.div = this.front.divMaker(this.front.footer)
+				this.front.footer2.div = this.front.divMaker(this.front.footer2)
+				this.front.coins.div = this.front.divMaker(this.front.coins)
 				document.body.appendChild(this.front.footer.div)
 				document.body.appendChild(this.front.footer2.div)
 				document.body.appendChild(this.front.coins.div)
@@ -168,6 +106,12 @@ class Asteroid {
 				obj.className = frontpart.type
 				obj.textContent = frontpart.content
 				obj.style.position = 'absolute'
+				if (frontpart.type === 'nextplayer' || frontpart.type === 'gameover') {
+					obj.style.top = '50%'
+					obj.style.left = '50%'
+					obj.style.transform = 'translate(-50%,-50%)'
+					obj.style.textAlign = 'center'
+				}
 				if (frontpart.type === 'titlebloc') {
 					obj.style.top = '50%'
 					obj.style.left = '50%'
@@ -213,36 +157,69 @@ class Asteroid {
 				this.coins = this.coins < 99 ? this.coins + 1 : this.coins
 				this.front.coins.div.textContent = this.coins
 			},
-			removeinfo: () => {
+			removeSplash: () => {
 				this.front.titlebloc.div.remove()
-				// this.front.subtitle.div.remove()
 				this.front.footer.div.remove()
 				this.front.footer2.div.remove()
 				this.front.coins.div.remove()
 			},
-			removeTouch: () => {
-				this.front.up.div.remove()
-				this.front.down.div.remove()
-				this.front.left.div.remove()
-				this.front.right.div.remove()
-				this.front.shoot.div.remove()
-			},
 			addScore: (source) => {
-				console.log('add ' + parseInt(source.pts) + 'pts to : player ' + this.actualPlayer)
 				let player = this.players.players[this.actualPlayer]
 				if (source.pts > 0 && (player.score === 0 || player.score > 0)) {
 					player.score = player.score + parseInt(source.pts)
 					let targetScore = 'scorep' + (this.actualPlayer + 1)
 					this.front[targetScore].div.textContent = parseInt(player.score)
+					this.updateBestLocalScore(player)
 				}
 			},
-			checkfront: (source) => {
-				if (this.actualPlayer) {
-					console.log('checkfront:' + source)
+			deathmodal: (player) => {
+				this.front.nextplayer.div = this.front.divMaker(this.front.nextplayer)
+				if (player.lives <= 0) {
+					this.front.nextplayer.div.textContent = 'Game over player ' + (this.actualPlayer + 1) + ' ' + player.score + ' pts'
+					document.body.appendChild(this.front.nextplayer.div)
 				}
-			}
+				else {
+					this.front.nextplayer.div.textContent = 'p' + (((this.actualPlayer != 0 && this.actualPlayer + 1 > this.players.players.length) ? 1 : this.actualPlayer + 1)) + ' ' + player.lives + 'live' + (player.lives > 1 ? 's' : '') + ' remaining'
+					document.body.appendChild(this.front.nextplayer.div)
+				}
+			},
+			nextPlayerModal: (player) => {
+				this.giveDelay(2000).then(() => {
+					this.front.nextplayer.div.remove()
+					this.front.nextplayer.div = this.front.divMaker(this.front.nextplayer)
+					this.front.nextplayer.div.textContent = 'Next Player p' + ((this.actualPlayer != 0 && this.actualPlayer + 1 > this.players.players.length) ? 1 : this.actualPlayer + 1)
+					document.body.appendChild(this.front.nextplayer.div)
+				})
+			},
 		}
 		return front
+	}
+	updateBestLocalScore = (player) => {
+		if (!localStorage.getItem('asteroidLocalScore') < player.score) {
+			localStorage.setItem('asteroidLocalScore', player.score);
+		}
+	}
+	initLocalStorage = (player) => {
+		if (!localStorage.getItem('asteroidLocalScore')) {
+			localStorage.setItem('asteroidLocalScore', 0);
+			localStorage.setItem('asteroidDate', '123456789');
+		}
+	}
+	gameOver = () => {
+		this.actualPlayer = 0;
+		this.players.players = [];
+		this.shipList = 0
+		this.rendertics = 0
+		this.front.gameover.div = this.front.divMaker(this.front.gameover)
+		this.front.gameover.div.textContent = 'Game over'
+		document.body.appendChild(this.front.gameover.div)
+		this.giveDelay(3000).then(() => {
+			this.front.gameover.div.remove()
+			this.front.removeTouch()
+			this.front.createSplash()
+			this.addEventKeyHelp()
+			this.wait = false
+		})
 	}
 	divMaker = (type, item, player) => {
 		// type Player || Asteroid
@@ -411,14 +388,14 @@ class Asteroid {
 		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
-
+		// --
 		stringcss += '.ship {opacity: 1; animation: .3s linear init;}'
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
 		stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '.ship.explode {background-color:none;animation: 3s linear explode;opacity: 0;}'
 		stringcss += '@keyframes explode {from {transform: scale(1) rotate(-360deg);opacity: 1;}to {top:50%;left:50%;transform: scale(18) rotate(360deg);opacity: 0;animation-play-state: paused;}}'
-
+		// --
 		stringcss += '@keyframes alerte {from {transform: scale(2);opacity: 1;}to {transform: scale(1)opacity: 0;}}'
 		stringcss += '#devconsole {z-index:-2000;position: absolute;top: 10px;left: 10px;width: -webkit-max-content;width: -moz-max-content;width: max-content;}'
 		stringcss += '#devconsole .devplayer,#devconsole .devship {display:none}'
@@ -427,15 +404,14 @@ class Asteroid {
 		stringcss += '#devconsole {font-size: min(calc((100vh /100)*1.6 ), 1rem) }'
 		stringcss += '.titlebloc {font-size: max(2rem, calc((100vw /100)*3 ))}'
 		stringcss += '.subtitle {font-size: max(1rem, calc((100vw /100)*1.5 ))}'
-
+		// --
 		stringcss += '.shoot {font-size: calc((100vw /100)*1.7 )}'
 		stringcss += '.footer {font-size: calc((100vh /100)*1.4 )}'
 		stringcss += '.footer2 {font-size: min(.5rem, calc((100vw /100)*1.2 ))}'
 		stringcss += '.scorep1,.scorep2 {font-size: calc((100vh /100)*1.1 )}'
 		stringcss += '.coins {font-size: calc((100vh /100)*1.1 )}'
 		stringcss += '.shoot,.footer,.footer2,.coins,.scorep1,.scorep2,.titlebloc {opacity: 1; animation: 1s linear init;}'
-
-
+		// --
 		this.addCss(stringcss, 'main')
 	}
 	addCss(stringcss, styleid) {
@@ -446,16 +422,7 @@ class Asteroid {
 	}
 	startGame = (nbplayer = false) => {
 		if (nbplayer) {
-
-			this.front.removeinfo()
-			this.front.createTouch()
-
-			// STARS ?? REALY NOT NEEDED
-			// if (this.stars) {
-			// 	this.stars.create()
-			// 	this.stars.add()
-			// }
-
+			this.front.removeSplash()
 			// PLAYERS
 			if (nbplayer === 1) {
 				this.players.create()
@@ -464,25 +431,23 @@ class Asteroid {
 				this.players.create()
 				this.players.create()
 			}
-			this.keepPlaying()
+			this.front.createTouch()
+			this.Play()
 		}
 	}
-	keepPlaying = () => {
-		// ASTEROIDS
-
+	Play = () => {
 		//RENDER addship
 		this.players.players[this.actualPlayer].ships.addship(this.players.players[this.actualPlayer])
 		this.players.players[this.actualPlayer].ships.addtodom()
-		// this.setPause()
 		//RENDER 
-		// this.gameRender = (() => { this.render() }, this.renderInterval);
+		this.rendertics = 0
 		this.gameRender = setInterval(() => { this.render() }, this.renderInterval);
-
 		// ASTEROIDS
 		this.asteroids.create(this.players.players[this.actualPlayer].lv)
 		this.addEventKey()
 	}
 	render = () => {
+		this.rendertics++
 		if (!this.isPause && !this.wait) {
 			// ASTEROIDS
 			this.asteroids.renderAsteroids()
@@ -495,38 +460,6 @@ class Asteroid {
 	giveDelay = (time) => {
 		return new Promise(resolve => setTimeout(resolve, time));
 	}
-	// starsManager = () => {
-	// 	let datas = {
-	// 		stars: [],
-	// 		add: () => {
-	// 			for (let index = 0; index < this.stars.stars.length; index++) {
-	// 				this.stars.stars[index].div = this.divMaker('star', this.stars.stars[index]);
-	// 				this.stars.addtodom(this.stars.stars[index])
-	// 			}
-	// 		},
-	// 		addtodom: (star) => {
-	// 			document.body.appendChild(star.div)
-	// 		},
-	// 		create: () => {
-	// 			let immat = this.stars.stars.length ?? 0
-	// 			this.stars.stars.push({
-	// 				immat: immat,
-	// 				type: 'star',
-	// 				visual: '🌟',//🧭
-	// 				x: this.center.x,
-	// 				y: this.center.y,
-	// 				z: this.center.z, // 3d
-	// 				w: 48,
-	// 				h: 48,
-	// 				l: 48, // 3d
-	// 				orbitdelay: [0, 50], // current,orbit refreh delay 
-	// 				range: { x: 100, y: 100, z: 100 }, // range of orbit effect in pixels
-	// 				div: Object
-	// 			})
-	// 		}
-	// 	}
-	// 	return datas
-	// }
 	playersManager = () => {
 		let datas = {
 			players: [],
@@ -551,10 +484,10 @@ class Asteroid {
 						let currentship = player.ship
 						currentship.d += player.dir.right === 1 ? currentship.dstep : 0;
 						currentship.d -= player.dir.left === 1 ? currentship.dstep : 0;
-
+						// --
 						if (currentship.d > 360) { currentship.d = currentship.d - 360 }
 						else if (currentship.d < 0) { currentship.d = currentship.d + 360 }
-
+						// --
 						player.resetdir(player)
 					},
 					changedir: (dir, datas) => {
@@ -573,104 +506,66 @@ class Asteroid {
 								player.dir.down = 1
 								break
 							default:
-								console.log('empty changedir()')
+								this.devTools.setBugAndPause('empty changedir()');
 								break
 						}
 					},
 				}
 				this.players.players.push(newplayer)
-				// this.players.players[immat].ships.addship(this.players.players[immat])
 			},
 			death: () => {
+				this.wait = true // stuck render
+				clearInterval(this.gameRender);
 				let player = this.players.players[this.actualPlayer]
 				this.players.players[this.actualPlayer].lives -= 1
+				this.front.deathmodal(player)
 				let ship = player.ship
-				this.wait = true
-				clearInterval(this.gameRender);
 				ship.div.classList.remove('alerte')
 				ship.div.classList.add('explode')
+				// ASTEROIDS
 				this.asteroids.clearAsteroids()
-
 
 				this.giveDelay(3000).then(() => {
 					let player = this.players.players[this.actualPlayer]
 					let ship = player.ship
-					ship.div.remove()
-
-					let nextplayerimmat = this.players.getNextPlayerWithLives()
-
-					console.log('nextplayerimmat')
-					console.log(nextplayerimmat)
-					if (nextplayerimmat === false) {
-						console.log('game OVERRRRRRRRRRRRR:')
+					this.front.nextplayer.div.remove()
+					let nextplayer = this.players.getNextPlayer(this.actualPlayer)
+					if (nextplayer === false) {
+						// GAME END
+						this.gameOver()
+					} else {
+						ship.div.remove()
+						this.actualPlayer = nextplayer
+						this.front.nextPlayerModal(this.players.players[this.actualPlayer])
+						this.giveDelay(3000).then(() => {
+							this.front.nextplayer.div.remove()
+							this.wait = false // unstuck render
+							this.Play()
+						})
 					}
-					else {
-						console.log('nextplayerimmat:' + nextplayerimmat)
-						this.actualPlayer = nextplayerimmat
-					}
-					console.log('next:' + nextplayerimmat)
-					console.log('giveDelay this.actualPlayer :' + this.actualPlayer + ' died')
-					console.log('giveDelay player.immat :' + player.immat)
-					console.log('giveDelay player.lives:' + player.lives)
-
-					// // test if more than 1 player
-					// if (this.players.players.length > 1) {
-					// 	this.actualPlayer += 1;
-					// 	if (this.actualPlayer >= this.maxPlayer) {
-					// 		this.actualPlayer = 0
-					// 	}
-					// }
-					// player = this.players.players[this.actualPlayer]
-					// ship = player.ship
-					// // test player lives
-					// if (this.players.players[this.actualPlayer].lives > 0) {
-					// 	player = this.players.players[this.actualPlayer]
-					// 	console.log(player)
-					// }
-					// else {
-					// 	// gam over this player
-					// 	console.log('--------------------game over this player')
-					// 	player.gameover = true
-					// 	this.wait = true
-					// }
-
-					this.wait = false
-					this.keepPlaying()
 				});
 			},
-			getNextPlayerWithLives: () => {
-				let nblivespositiv = 0
-				let nbreponse = 0
-				let stop = false
+			getNextPlayer: (playerImmat, nbcheck = 1, stop = false) => {
+				let nextPlayer = false
+				let nbItem = 0
 				this.players.players.forEach(player => {
-					if (player.lives > 0) { nblivespositiv++ }
-					if (player.lives > 0 && stop != true) {
-						stop = true
-						console.log('--------------------------------------lives:' + player.lives)
-						console.log('----------------------------------------player.immat:' + player.immat)
-
-						if (player.immat > this.actualPlayer) {
-							nbreponse++
-							console.log(player.immat, this.actualPlayer, player.lives)
+					if (player.immat > playerImmat && !stop) {
+						if (player.lives > 0) {
+							nextPlayer = player.immat
+							stop = true
+							nbItem++
+							return nextPlayer
 						}
 					}
-				});
-				if (nbreponse > 0) {
-					return nbreponse
+				})
+				if (stop === true) {
+					return nextPlayer
 				}
-				else {
-					if (nblivespositiv > 0) {
-						this.players.players.forEach(player => {
-							if (player.lives > 0) {
-								return player.immat
-							}
-						})
-						return false
-					}
-					else {
-						return false
-					}
+				if (stop === false && nbcheck < this.maxPlayer) {
+					nbcheck++
+					return this.players.getNextPlayer(-1, nbcheck)
 				}
+				return false
 			},
 			renderPlayer: () => {
 				let player = this.players.players[this.actualPlayer]
@@ -710,66 +605,63 @@ class Asteroid {
 			},
 			check_PlayerMoves: (player) => {
 				let ship = player.ship
-				// let distance = this.getDistance(player,star)
 				let x = ship.x
 				let y = ship.y
 				let z = ship.z // 3d
 				let d = ship.d
 				let speed = ship.speed
-				// let dRatio = parseInt(d / 360 * 100000) / 100000 // 0.0 to 1
 
 				// 0:'normal', 1:'nogravity', 2:'ia', 3:'orbit', 4:'polar'
 				if (ship.mods.move === 0) { // normal move mods
-					// to do
-					// console.log(d)
-					ship.x = parseInt((ship.x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
-					ship.y = parseInt((ship.y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
+					ship.x = parseInt((x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
+					ship.y = parseInt((y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
+					// ship.z ??
 				}
-				else if (ship.mods.move === 1) { // nogravity ??
-					// to do
-					ship.x = parseInt((ship.x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
-					ship.y = parseInt((ship.y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
-				}
-				else if (ship.mods.move === 2) { // ia
-					// to do
-				}
-				else if (ship.mods.move === 3 && this.stars) { // orbit
-					let star = this.stars.stars[0]
-					// star center pos
-					let starx = star.x + (star.w / 2)
-					let stary = star.y + (star.h / 2)
-					let starw = star.range.x / 2
-					let starh = star.range.y / 2
-					let starl = star.range.z / 2 // z-index
-					// new pos
-					let x2 = 0
-					let y2 = 0
-					let distance = this.getDistance(player, star)
-					if (distance > 0) { // need modification
-						x2 = starx + Math.round((distance) * (Math.cos(ship.d * (180 / Math.PI))));
-						y2 = stary + Math.round((distance) * (Math.sin(ship.d * (180 / Math.PI))));
-						ship.d += 1
-					}
-					else {
-						x2 = starx + Math.round(starw * (Math.cos(ship.d * (180 / Math.PI))));
-						y2 = stary + Math.round(starh * (Math.sin(ship.d * (180 / Math.PI))));
-						ship.d += 1
-					}
-					// saving new pos in obj
-					ship.x = x2 - (ship.w / 2)
-					ship.y = y2 - (ship.h / 2)
-					// if(ship.d >360){ship.d=1}
-				}
-				else if (ship.mods.move === 4) { // polar coordinate 
-					if (ship.d === 360 || ship.d === 0) { ship.y -= ship.speed } // N
-					if (ship.d === 45) { ship.x += ship.speed; ship.y -= ship.speed } // NE
-					if (ship.d === 90) { ship.x += ship.speed; } // E
-					if (ship.d === 135) { ship.x += ship.speed; ship.y += ship.speed } // SE
-					if (ship.d === 180) { ship.y += ship.speed } // S
-					if (ship.d === 225) { ship.x -= ship.speed; ship.y += ship.speed } // SW
-					if (ship.d === 270) { ship.x -= ship.speed; } // W
-					if (ship.d === 315) { ship.x -= ship.speed; ship.y -= ship.speed } // NW
-				}
+				// else if (ship.mods.move === 1) { // nogravity ??
+				// 	// to do
+				// 	ship.x = parseInt((ship.x + (speed * Math.cos((d) * (Math.PI / 180)))) * 100) / 100
+				// 	ship.y = parseInt((ship.y + (speed * Math.sin((d) * (Math.PI / 180)))) * 100) / 100
+				// }
+				// else if (ship.mods.move === 2) { // ia
+				// 	// to do
+				// }
+				// else if (ship.mods.move === 3 && this.stars) { // orbit
+				// 	let star = this.stars.stars[0]
+				// 	// star center pos
+				// 	let starx = star.x + (star.w / 2)
+				// 	let stary = star.y + (star.h / 2)
+				// 	let starw = star.range.x / 2
+				// 	let starh = star.range.y / 2
+				// 	let starl = star.range.z / 2 // z-index
+				// 	// new pos
+				// 	let x2 = 0
+				// 	let y2 = 0
+				// 	let distance = this.getDistance(player, star)
+				// 	if (distance > 0) { // need modification
+				// 		x2 = starx + Math.round((distance) * (Math.cos(ship.d * (180 / Math.PI))));
+				// 		y2 = stary + Math.round((distance) * (Math.sin(ship.d * (180 / Math.PI))));
+				// 		ship.d += 1
+				// 	}
+				// 	else {
+				// 		x2 = starx + Math.round(starw * (Math.cos(ship.d * (180 / Math.PI))));
+				// 		y2 = stary + Math.round(starh * (Math.sin(ship.d * (180 / Math.PI))));
+				// 		ship.d += 1
+				// 	}
+				// 	// saving new pos in obj
+				// 	ship.x = x2 - (ship.w / 2)
+				// 	ship.y = y2 - (ship.h / 2)
+				// 	// if(ship.d >360){ship.d=1}
+				// }
+				// else if (ship.mods.move === 4) { // polar coordinate 
+				// 	if (ship.d === 360 || ship.d === 0) { ship.y -= ship.speed } // N
+				// 	if (ship.d === 45) { ship.x += ship.speed; ship.y -= ship.speed } // NE
+				// 	if (ship.d === 90) { ship.x += ship.speed; } // E
+				// 	if (ship.d === 135) { ship.x += ship.speed; ship.y += ship.speed } // SE
+				// 	if (ship.d === 180) { ship.y += ship.speed } // S
+				// 	if (ship.d === 225) { ship.x -= ship.speed; ship.y += ship.speed } // SW
+				// 	if (ship.d === 270) { ship.x -= ship.speed; } // W
+				// 	if (ship.d === 315) { ship.x -= ship.speed; ship.y -= ship.speed } // NW
+				// }
 			}
 		}
 		return datas
@@ -922,11 +814,11 @@ class Asteroid {
 				}
 				// colliding
 				if (distance < deadrange) {
-					console.log(' 1 -----------')
-					console.log('normal death')
-					console.log('distance < deadrange')
-					console.log(distance, deadrange)
-					console.log(asteroid, ship)
+					// console.log(' 1 -----------')
+					// console.log('normal death')
+					// console.log('distance < deadrange')
+					// console.log(distance, deadrange)
+					// console.log(asteroid, ship)
 					this.players.death(asteroidIndex)
 					// this.asteroids.addToDeleteList(asteroidIndex)
 				}
@@ -1042,12 +934,8 @@ class Asteroid {
 			addship: (player) => {
 				let newship = player.ships.getnewship(player)
 				player.ship = newship
-				// player.ships.ships.push(newship)
-				console.log('newship', newship)
 			},
 			addtodom: () => {
-				// this.players.players[this.actualPlayer].ship.div.textContent = this.players.players[this.actualPlayer].ship.visual
-				// let player = this.players.players[playerimmat]
 				let player = this.players.players[this.actualPlayer]
 				let ship = player.ship
 				document.body.appendChild(ship.div)
@@ -1063,7 +951,7 @@ class Asteroid {
 						ship.speed -= ship.speed > ship.speedrange.min ? 1 : 0
 						break
 					default:
-						console.log('empty changespeed()')
+						this.devTools.setBugAndPause('empty changespeed()');
 						break
 				}
 			},
@@ -1089,7 +977,6 @@ class Asteroid {
 				player = this.players.players[player.immat]
 				this.shipList += 1
 				let newshipimmat = this.shipList
-				console.log('getnewship newshipimmat:' + newshipimmat)
 				let ship = {
 					type: 'ship',
 					immat: newshipimmat,
@@ -1113,24 +1000,24 @@ class Asteroid {
 						limits: ['mirrored', 'test'],
 						move: 0,
 						moves: ['nogravity', 'polar', 'ia', 'orbit', 'normal'],
-						next: (modename) => { // l
-							let player = this.players.players[this.actualPlayer]
-							let ship = player.ship
-							ship.mods[modename] =
-								ship.mods[modename] < ship.mods[modename + 's'].length - 1
-									? ship.mods[modename] += 1
-									: 0;
-							// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
-						},
-						preview: (modename) => { // o key
-							let player = this.players.players[this.actualPlayer]
-							let ship = player.ship
-							ship.mods[modename] =
-								ship.mods[modename] > 0
-									? ship.mods[modename] -= 1
-									: ship.mods[modename + 's'].length - 1;
-							// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
-						}
+						// next: (modename) => { // l
+						// 	let player = this.players.players[this.actualPlayer]
+						// 	let ship = player.ship
+						// 	ship.mods[modename] =
+						// 		ship.mods[modename] < ship.mods[modename + 's'].length - 1
+						// 			? ship.mods[modename] += 1
+						// 			: 0;
+						// 	// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
+						// },
+						// preview: (modename) => { // o key
+						// 	let player = this.players.players[this.actualPlayer]
+						// 	let ship = player.ship
+						// 	ship.mods[modename] =
+						// 		ship.mods[modename] > 0
+						// 			? ship.mods[modename] -= 1
+						// 			: ship.mods[modename + 's'].length - 1;
+						// 	// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
+						// }
 					},
 				}
 				ship.div = this.divMaker('ship', ship, player)
@@ -1145,10 +1032,10 @@ class Asteroid {
 			if (eventkeydown.key === "&" || eventkeydown.key === "1") { this.startGame(1) }
 			if (eventkeydown.key === "é" || eventkeydown.key === "2") { this.startGame(2) }
 			if (eventkeydown.key === "c") { this.front.addCoin() }
-			if (eventkeydown.key === "n") { ship.mods.next('move') }
-			if (eventkeydown.key === "j") { ship.mods.preview('move') }
-			if (eventkeydown.key === "l") { ship.mods.next('limit') } // 3d
-			if (eventkeydown.key === "k") { ship.mods.preview('limit') }
+			// if (eventkeydown.key === "n") { ship.mods.next('move') }
+			// if (eventkeydown.key === "j") { ship.mods.preview('move') }
+			// if (eventkeydown.key === "l") { ship.mods.next('limit') } // 3d
+			// if (eventkeydown.key === "k") { ship.mods.preview('limit') }
 			if (eventkeydown.key === "v") { this.setVisualHelp() }
 		}
 		if (document.getElementById('devconsole')) {
@@ -1168,13 +1055,12 @@ class Asteroid {
 	}
 	addEventKey() {
 		document.onkeydown = (eventkeydown) => {
-			let player = this.players.players[this.actualPlayer]
-			let ship = player.ship
-
 			if (eventkeydown.key === "i") { this.setDisplayInfo() }
 			if (eventkeydown.key === "p") { this.setPause() }
 			if (eventkeydown.key === "v") { this.setVisualHelp() }
 
+			let player = this.players.players[this.actualPlayer]
+			let ship = player.ship
 			if (eventkeydown.key === " ") { player.ships.shoot('icecube') }
 			if (eventkeydown.key === "ArrowLeft") { player.changedir(eventkeydown.key) }
 			if (eventkeydown.key === "ArrowRight") { player.changedir(eventkeydown.key) }
@@ -1223,8 +1109,10 @@ class Asteroid {
 		}
 	}
 	getDistance = (a, b) => { // get hypotenus with pythaGore
-		let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
-		let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
+		// let AB = (a.x + (a.w / 2)) - (b.x + (b.w / 2))
+		// let AC = (a.y + (a.h / 2)) - (b.y + (b.h / 2))
+		let AB = (a.x) - (b.x)
+		let AC = (a.y) - (b.y)
 		return Math.sqrt((AB * AB) + (AC * AC))
 	}
 	getDevTools = () => {
