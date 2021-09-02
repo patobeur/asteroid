@@ -184,7 +184,7 @@ class Asteroid {
 				}
 			},
 			nextPlayerModal: (player) => {
-				this.giveDelay(2000).then(() => {
+				this.giveDelay(1000).then(() => {
 					this.front.nextplayer.div.remove()
 					this.front.nextplayer.div = this.front.divMaker(this.front.nextplayer)
 					this.front.nextplayer.div.textContent = 'Next Player p' + ((this.actualPlayer != 0 && this.actualPlayer + 1 > this.players.players.length) ? 1 : this.actualPlayer + 1)
@@ -195,13 +195,12 @@ class Asteroid {
 		return front
 	}
 	updateBestLocalScore = (player) => {
-		if (!localStorage.getItem('asteroidLocalScore') < player.score) {
-			localStorage.setItem('asteroidLocalScore', player.score);
-		}
+		localStorage.setItem('asteroidLocalScore', player.score);
 	}
 	initLocalStorage = (player) => {
 		if (!localStorage.getItem('asteroidLocalScore')) {
 			localStorage.setItem('asteroidLocalScore', 0);
+			localStorage.setItem('asteroidLocalCoin', 0);
 			localStorage.setItem('asteroidDate', '123456789');
 		}
 	}
@@ -443,7 +442,7 @@ class Asteroid {
 		this.rendertics = 0
 		this.gameRender = setInterval(() => { this.render() }, this.renderInterval);
 		// ASTEROIDS
-		this.asteroids.create(this.players.players[this.actualPlayer].lv)
+		this.asteroids.createStarter(this.players.players[this.actualPlayer].lv)
 		this.addEventKey()
 	}
 	render = () => {
@@ -670,31 +669,66 @@ class Asteroid {
 		let data = {
 			kills: 0,
 			asteroids: [],
+			asteroidImmat: 0,
 			asteroidstodelete: [],
 			max: 8,
+			tetha: 0,
 			speeds: { 0: 5 },
-			create: (e) => {
+			createStarter: (e) => {
 				for (let i = 0; i < this.asteroids.max; i++) {
-					let immat = this.asteroids.asteroids.length
-					let asteroid = {
-						immat: immat,
-						speed: 2,
-						type: 'asteroid',
-						x: 32,// - ( ship.w/2),
-						y: 32,// - ( ship.h/2),
-						z: 32,// - ( ship.l/2), // 3d
-						w: 32,
-						h: 32,
-						l: 32, // 3d
-						d: this.aleaEntreBornes(1, 360),
-						range: { x: 32, y: 32, z: 32 }, // range 
-						pts: 100,
-						lv: 1,//this.aleaEntreBornes(1, 3),
-						div: Object,
-						nearest: false
-					}
-					this.asteroids.addtostack(asteroid)
+					this.asteroids.getNewAsteroid(0)
 				}
+			},
+			getNewAsteroid: (lv = 1, parentAsteroid = false) => {
+				let immat = this.asteroids.asteroidImmat
+				let ratio = (.7 * (lv === 0 ? 1 : lv))
+				let asteroid = {
+					immat: immat,
+					speed: 2,
+					type: 'asteroid',
+					nearest: false,
+					x: this.center.x,
+					y: this.center.y,
+					z: this.center.z,
+					d: 0,
+					w: 32 / ratio,
+					h: 32 / ratio,
+					l: 32 / ratio, // 3d
+					// range 
+					range: {
+						x: 32 / ratio,
+						y: 32 / ratio,
+						z: 32 / ratio
+					},
+					pts: 50 * (lv === 0 ? 1 : lv),
+					lv: 0 + (lv === 0 ? 1 : lv),
+					div: Object,
+				}
+				if (lv === 0 && !parentAsteroid) {
+					console.log('orbital')
+					let distance = 150
+					this.asteroids.tetha = (this.asteroids.tetha > 315 ? 0 : this.asteroids.tetha + 400 / 8)
+					asteroid.d = this.asteroids.tetha
+					asteroid.x = asteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
+					asteroid.y = asteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
+					console.log(asteroid.d)
+				}
+				if (parentAsteroid) {
+					let distance = 10
+					this.asteroids.tetha = (this.asteroids.tetha > 400 ? 0 : this.asteroids.tetha + 45)
+					asteroid.d = this.asteroids.tetha
+					asteroid.x = parentAsteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
+					asteroid.y = parentAsteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
+					console.log(asteroid.d)
+
+
+					// asteroid.x = this.aleaEntreBornes(parentAsteroid.x - parentAsteroid.w, parentAsteroid.x + parentAsteroid.w)
+					// asteroid.y = this.aleaEntreBornes(parentAsteroid.y - parentAsteroid.h, parentAsteroid.x + parentAsteroid.h)
+					// asteroid.z = this.aleaEntreBornes(parentAsteroid.z - parentAsteroid.l, parentAsteroid.x + parentAsteroid.l)
+					asteroid.lv = asteroid.lv < 5 ? parentAsteroid.lv + 1 : 1
+				}
+				this.asteroids.asteroidImmat++
+				this.asteroids.addtostack(asteroid)
 			},
 			addtostack: (asteroid) => {
 				asteroid.div = this.divMaker(asteroid.type, asteroid, false)
@@ -711,12 +745,12 @@ class Asteroid {
 				let asteroidkey = 0
 				let player = this.players.players[this.actualPlayer]
 				let ship = player.ship
-				if (this.asteroids.asteroids.length > 0 && !this.isPause) {
+				if (this.asteroids.asteroidImmat > 0 && !this.isPause) {
 
 					//-- forEach asteroid
 					this.asteroids.asteroids.forEach(asteroid => {
 						// get nearest asteroid from ship
-						asteroid.div.classList.remove('nearest')
+						// asteroid.div.classList.remove('nearest')
 						ship.div.classList.remove('alerte')
 						asteroid.nearest = false
 						ship.alerte = false
@@ -738,7 +772,7 @@ class Asteroid {
 				//  if nearest asteroid still exist
 				if (asteroidIndex >= 0 && this.asteroids.asteroids[asteroidIndex]) {
 					this.asteroids.asteroids[asteroidIndex].nearest = true
-					this.asteroids.asteroids[asteroidIndex].div.classList.add('nearest')
+					// this.asteroids.asteroids[asteroidIndex].div.classList.add('nearest')
 					this.asteroids.check_collisions_ship(asteroidIndex)
 					asteroidIndex = false
 				}
@@ -772,12 +806,9 @@ class Asteroid {
 						let distance = this.getDistance(asteroid, projectil);
 						if (distance < ((projectil.w / 2) + (asteroid.w / 2))) {
 							asteroid.explode = true
-							asteroid.div.classList.add('unarmed')
+
+							asteroid.div.classList.add('unarmed') // bug there if removed ??
 							asteroid.div.textContent = "BOOM"
-
-
-							// console.log('dead asteroid immat:' + asteroid.immat)
-
 
 							this.front.addScore(asteroid)
 							this.projectils.addToDeleteList(projectilIndex)
@@ -804,27 +835,16 @@ class Asteroid {
 
 				// if (!asteroid.explode) {
 				// alerte distance
-
 				if ((distance) < alerterange) {
 					ship.div.classList.add('alerte')
-					// console.log('alerte:' + asteroid.immat)
 				}
 				else {
 					ship.div.classList.remove('alerte')
 				}
-				// colliding
+				// colliding to death
 				if (distance < deadrange) {
-					// console.log(' 1 -----------')
-					// console.log('normal death')
-					// console.log('distance < deadrange')
-					// console.log(distance, deadrange)
-					// console.log(asteroid, ship)
 					this.players.death(asteroidIndex)
-					// this.asteroids.addToDeleteList(asteroidIndex)
 				}
-				// delete asteroids from array
-				// this.asteroids.clearDeleteList()
-				// }
 			},
 			addToDeleteList: (asteroidIndex) => {
 				this.asteroids.asteroidstodelete.push(asteroidIndex)
@@ -833,8 +853,14 @@ class Asteroid {
 				// delete asteroids
 				if (this.asteroids.asteroidstodelete.length > 0) {
 					this.asteroids.asteroidstodelete.forEach(asteroidIndex => {
-						this.asteroids.asteroids[asteroidIndex].div.remove()
+
+						this.animateHelpCSS('unarmed', true, this.asteroids.asteroids[asteroidIndex].div).then((message) => {
+						});
+						let parent = this.asteroids.asteroids[asteroidIndex]
 						this.asteroids.asteroids.splice(asteroidIndex, 1);
+						this.asteroids.getNewAsteroid(parent.lv, parent)
+						this.asteroids.getNewAsteroid(parent.lv, parent)
+
 					})
 					this.asteroids.asteroidstodelete = []
 				}
@@ -842,6 +868,7 @@ class Asteroid {
 			clearAsteroids: () => {
 				this.asteroids.asteroids.forEach(element => { element.div.remove() });
 				this.asteroids.asteroids = []
+				this.asteroids.asteroidImmat = 0
 			}
 		}
 		return data
@@ -999,25 +1026,7 @@ class Asteroid {
 						limit: 0,
 						limits: ['mirrored', 'test'],
 						move: 0,
-						moves: ['nogravity', 'polar', 'ia', 'orbit', 'normal'],
-						// next: (modename) => { // l
-						// 	let player = this.players.players[this.actualPlayer]
-						// 	let ship = player.ship
-						// 	ship.mods[modename] =
-						// 		ship.mods[modename] < ship.mods[modename + 's'].length - 1
-						// 			? ship.mods[modename] += 1
-						// 			: 0;
-						// 	// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
-						// },
-						// preview: (modename) => { // o key
-						// 	let player = this.players.players[this.actualPlayer]
-						// 	let ship = player.ship
-						// 	ship.mods[modename] =
-						// 		ship.mods[modename] > 0
-						// 			? ship.mods[modename] -= 1
-						// 			: ship.mods[modename + 's'].length - 1;
-						// 	// console.log('mods:' + ship.mods[modename], ship.mods[modename + 's'][ship.mods[modename]])
-						// }
+						moves: ['nogravity', 'polar', 'ia', 'orbit', 'normal']
 					},
 				}
 				ship.div = this.divMaker('ship', ship, player)
@@ -1118,27 +1127,10 @@ class Asteroid {
 	getDevTools = () => {
 		return {
 			refreshconsole: (player) => { // dev tools only // remove this if on prod
-				let ship = player.ship
-				let nbAsteroids = this.asteroids.asteroids.length
-				let nbProjectils = this.projectils.projectils.length
+				// let ship = player.ship
+				// let nbAsteroids = this.asteroids.asteroids.length
+				// let nbProjectils = this.projectils.projectils.length
 				if (document.getElementById('devconsole')) {
-					document.getElementById('devplayerimmat').textContent = 'playerimmat:' + this.actualPlayer//player.immat
-
-					document.getElementById('devlives').textContent = 'lives:' + player.lives
-					document.getElementById('devscore').textContent = 'score:' + player.score
-					document.getElementById('devlv').textContent = 'lv:' + player.lv
-
-					document.getElementById('devx').textContent = 'x:' + ship.x
-					document.getElementById('devy').textContent = 'y:' + ship.y
-					document.getElementById('devz').textContent = 'z:' + ship.z
-					document.getElementById('devd').textContent = 'd:' + ship.d + '°'
-
-					document.getElementById('devspeed').textContent = 'speed:' + ship.speed
-					document.getElementById('devmove').textContent = 'move:' + ship.mods.move + " [" + ship.mods.moves[ship.mods.move] + ']'
-					document.getElementById('devlimit').textContent = 'limit:' + ship.mods.limit + " [" + ship.mods.limits[ship.mods.limit] + ']'
-					document.getElementById('devdir').textContent = 'dir:' + player.dir.right + ',' + player.dir.left
-					document.getElementById('devasteroids').textContent = 'asteroids[]:' + nbAsteroids
-					document.getElementById('devprojectils').textContent = 'projectils[]:' + nbProjectils
 					document.getElementById('devvisualhelp').textContent = '[v] Visual Help ?? [' + (this.isVisualHelp ? 'On' : 'Off') + ']'
 				}
 			},
@@ -1152,6 +1144,23 @@ class Asteroid {
 			}
 		}
 	}
+	// add className to div and remove it after animation end and delete tag or not 
+	animateHelpCSS = (animation, remove = false, asteroidDiv, prefix = 'animate__') =>
+		// thx to friends
+		// & thx https://github.com/animate-css/animate.css/blob/main/docsSource/sections/04-javascript.md
+		// We create a Promise and return it
+		new Promise((resolve, reject) => {
+			let animationName = `${prefix}${animation}`;
+			asteroidDiv.classList.add(`${prefix}animated`, animationName);
+			// When the animation ends, we clean the classes and resolve the Promise
+			let handleAnimationEnd = (event) => {
+				event.stopPropagation();
+				// asteroidDiv.classList.remove(`${prefix}animated`, animationName);
+				resolve('Asteroid deleted');
+				if (remove) { asteroidDiv.remove() }
+			}
+			asteroidDiv.addEventListener('animationend', handleAnimationEnd, { once: true });
+		});
 }
 let isLoaded = () => {
 	let AsteroidGame = new Asteroid()
