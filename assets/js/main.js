@@ -29,6 +29,61 @@ class Asteroid {
 		this.addEventKeyHelp()
 		this.initLocalStorage()
 	}
+	startGame = (nbplayer = false) => {
+		if (nbplayer) {
+			this.front.removeSplash()
+			this.front.removePlayersMenu()
+
+			// PLAYERS
+			if (nbplayer === 1) {
+				this.players.create()
+			}
+			else if (nbplayer === 2) {
+				this.players.create()
+				this.players.create()
+			}
+			this.front.createTouch()
+			this.Play()
+		}
+	}
+	Play = () => {
+		//RENDER addship
+		this.players.players[this.actualPlayer].ships.addship(this.players.players[this.actualPlayer])
+		this.players.players[this.actualPlayer].ships.addtodom()
+		//RENDER 
+		this.rendertics = 0
+		this.gameRender = setInterval(() => { this.render() }, this.renderInterval);
+		// ASTEROIDS
+		this.asteroids.createStarter(this.players.players[this.actualPlayer].lv)
+		this.addEventKey()
+	}
+	render = () => {
+		this.rendertics++
+		if (!this.isPause && !this.wait) {
+			// ASTEROIDS
+			this.asteroids.renderAsteroids()
+			// PROJECTILS
+			this.projectils.renderProjectils()
+			// PLAYERS
+			this.players.renderPlayer()
+		}
+	}
+	gameOver = () => {
+		this.actualPlayer = 0;
+		this.players.players = [];
+		this.shipList = 0
+		this.rendertics = 0
+		this.front.gameover.div = this.front.divMaker(this.front.gameover)
+		this.front.gameover.div.textContent = 'Game over'
+		document.body.appendChild(this.front.gameover.div)
+		this.giveDelay(3000).then(() => {
+			this.front.gameover.div.remove()
+			this.front.removeTouch()
+			this.front.createSplash()
+			this.addEventKeyHelp()
+			this.wait = false
+		})
+	}
 	FrontManager = () => {
 		let front = {
 			content: 0,
@@ -50,9 +105,27 @@ class Asteroid {
 			coins: { content: 0, type: 'coins', div: Object },
 			nextplayer: { content: '', type: 'nextplayer', div: Object },
 			gameover: { content: 'gameover', type: 'gameover', div: Object },
+			playersmenu: { content: '', type: 'playersmenu', div: Object },
+			player1menu: { content: '', type: 'player1menu', div: Object },
+			player2menu: { content: '', type: 'player2menu', div: Object },
 			starter: () => {
 				this.front.createScores()
 				this.front.createSplash()
+				this.front.createPlayersMenu()
+			},
+			createPlayersMenu: () => {
+				this.front.player1menu.div = this.front.divMaker(this.front.player1menu)
+				this.front.player2menu.div = this.front.divMaker(this.front.player2menu)
+				// --
+				this.front.player1menu.div.addEventListener('click', (e) => { this.startGame(1) })
+				this.front.player2menu.div.addEventListener('click', (e) => { this.startGame(2) })
+				// --
+				document.body.appendChild(this.front.player1menu.div)
+				document.body.appendChild(this.front.player2menu.div)
+			},
+			removePlayersMenu: () => {
+				this.front.player1menu.div.remove()
+				this.front.player2menu.div.remove()
 			},
 			createTouch: () => {
 				this.front.up.div = this.front.divMaker(this.front.up)
@@ -106,6 +179,34 @@ class Asteroid {
 				obj.className = frontpart.type
 				obj.textContent = frontpart.content
 				obj.style.position = 'absolute'
+				if (frontpart.type === 'player1menu') {
+					obj.style.left = '10%'
+					obj.style.top = '50%'
+					obj.style.width = '10rem'
+					obj.style.height = '10rem'
+					obj.style.display = 'flex'
+					obj.style.flexDirection = 'row'
+					obj.style.justifyContent = 'center'
+					obj.style.alignItems = 'center'
+					obj.style.backgroundColor = '#00000022'
+					obj.style.border = '1px solid #FFFFFF22'
+					obj.textContent = '1P'
+					obj.style.borderRadius = '50%'
+				}
+				if (frontpart.type === 'player2menu') {
+					obj.style.right = '10%'
+					obj.style.top = '50%'
+					obj.style.width = '10rem'
+					obj.style.height = '10rem'
+					obj.style.display = 'flex'
+					obj.style.flexDirection = 'row'
+					obj.style.justifyContent = 'center'
+					obj.style.alignItems = 'center'
+					obj.style.backgroundColor = '#00000022'
+					obj.style.border = '1px solid #FFFFFF22'
+					obj.textContent = '2P'
+					obj.style.borderRadius = '50%'
+				}
 				if (frontpart.type === 'nextplayer' || frontpart.type === 'gameover') {
 					obj.style.top = '50%'
 					obj.style.left = '50%'
@@ -129,22 +230,24 @@ class Asteroid {
 					obj.style.backgroundColor = '#20FF2020'
 				}
 				if (frontpart.type === 'footer') {
-					obj.style.bottom = '15%'
+					obj.style.bottom = '10%'
 					obj.style.left = '50%'
 					obj.style.transform = 'translate(-50%, -50%)'
+					obj.style.width = "max-content"
 				}
 				if (frontpart.type === 'footer2') {
 					obj.style.bottom = '2%'
 					obj.style.left = '50%'
 					obj.style.transform = 'translate(-50%, -50%)'
+					obj.style.width = "max-content"
 				}
 				if (frontpart.type === 'scorep1') {
 					obj.style.top = '5%'
-					obj.style.left = '25%'
+					obj.style.left = '15%'
 				}
 				if (frontpart.type === 'scorep2') {
 					obj.style.top = '5%'
-					obj.style.right = '25%'
+					obj.style.right = '15%'
 				}
 				if (frontpart.type === 'coins') {
 					obj.style.top = '8%'
@@ -204,22 +307,6 @@ class Asteroid {
 			localStorage.setItem('asteroidDate', '123456789');
 		}
 	}
-	gameOver = () => {
-		this.actualPlayer = 0;
-		this.players.players = [];
-		this.shipList = 0
-		this.rendertics = 0
-		this.front.gameover.div = this.front.divMaker(this.front.gameover)
-		this.front.gameover.div.textContent = 'Game over'
-		document.body.appendChild(this.front.gameover.div)
-		this.giveDelay(3000).then(() => {
-			this.front.gameover.div.remove()
-			this.front.removeTouch()
-			this.front.createSplash()
-			this.addEventKeyHelp()
-			this.wait = false
-		})
-	}
 	divMaker = (type, item, player) => {
 		// type Player || Asteroid
 		let obj = document.createElement("div")
@@ -249,7 +336,7 @@ class Asteroid {
 			visual.style.justifyContent = 'center'
 			visual.style.alignItems = 'center'
 			visual.style.borderRadius = '50%'
-			visual.textContent = item.immat
+			// visual.textContent = item.immat
 			visual.style.fontSize = ".5rem"
 
 			let range = document.createElement('div')
@@ -381,16 +468,15 @@ class Asteroid {
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
 		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 1;}'
-		stringcss += '.asteroid.nearest {background-Color:green}'
-		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 48px;height: 48px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 64px;height: 64px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
 		// --
 		stringcss += '.ship {opacity: 1; animation: .3s linear init;}'
 		stringcss += '.ship.visual {background-image: url("data:image/svg+xml,%3Csvg version=\'1.0\' id=\'ship_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'0 0 8 16\' style=\'enable-background:new 0 0 8 16;\' xml:space=\'preserve\'%3E%3Cstyle type=\'text/css\'%3E.st0%7Bfill:none;stroke:%23FFFFFF;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;%7D%3C/style%3E%3Cpolygon id=\'XMLID_1_\' class=\'st0\' points=\'4,12.7 2.3,12.7 0.5,15.2 4,0.8 7.5,15.2 5.7,12.7 \'/%3E%3C/svg%3E%0A");background-position: center center;background-size: cover;background-repeat:no-repeat}'
-		stringcss += '.ship.range {background-color:#202020;}'
+		// stringcss += '.ship.range {background-color:#202020;}'
 		stringcss += '.ship.alerte .range {border: 1px dotted rgba(255, 0, 0, .9);animation: 0.3s linear infinite alerte;opacity: 1;}'
 		stringcss += '.ship.explode {background-color:none;animation: 3s linear explode;opacity: 0;}'
 		stringcss += '@keyframes explode {from {transform: scale(1) rotate(-360deg);opacity: 1;}to {top:50%;left:50%;transform: scale(18) rotate(360deg);opacity: 0;animation-play-state: paused;}}'
@@ -404,11 +490,11 @@ class Asteroid {
 		stringcss += '.titlebloc {font-size: max(2rem, calc((100vw /100)*3 ))}'
 		stringcss += '.subtitle {font-size: max(1rem, calc((100vw /100)*1.5 ))}'
 		// --
+		stringcss += '.footer {font-size: max(1rem, calc((100vw /100)*2 ))}'
+		stringcss += '.footer2 {font-size: max(.7rem, calc((100vw /100)*1.5 ))}'
+		stringcss += '.scorep1,.scorep2 {font-size:  max(1.2rem, calc((100vw /100)*1.1 ))}'
+		stringcss += '.coins {font-size:  max(1rem, calc((100vw /100)*1.1 ))}'
 		stringcss += '.shoot {font-size: calc((100vw /100)*1.7 )}'
-		stringcss += '.footer {font-size: calc((100vh /100)*1.4 )}'
-		stringcss += '.footer2 {font-size: min(.5rem, calc((100vw /100)*1.2 ))}'
-		stringcss += '.scorep1,.scorep2 {font-size: calc((100vh /100)*1.1 )}'
-		stringcss += '.coins {font-size: calc((100vh /100)*1.1 )}'
 		stringcss += '.shoot,.footer,.footer2,.coins,.scorep1,.scorep2,.titlebloc {opacity: 1; animation: 1s linear init;}'
 		// --
 		this.addCss(stringcss, 'main')
@@ -418,43 +504,6 @@ class Asteroid {
 		style.textContent = stringcss
 		style.id = styleid
 		document.getElementsByTagName('head')[0].appendChild(style);
-	}
-	startGame = (nbplayer = false) => {
-		if (nbplayer) {
-			this.front.removeSplash()
-			// PLAYERS
-			if (nbplayer === 1) {
-				this.players.create()
-			}
-			else if (nbplayer === 2) {
-				this.players.create()
-				this.players.create()
-			}
-			this.front.createTouch()
-			this.Play()
-		}
-	}
-	Play = () => {
-		//RENDER addship
-		this.players.players[this.actualPlayer].ships.addship(this.players.players[this.actualPlayer])
-		this.players.players[this.actualPlayer].ships.addtodom()
-		//RENDER 
-		this.rendertics = 0
-		this.gameRender = setInterval(() => { this.render() }, this.renderInterval);
-		// ASTEROIDS
-		this.asteroids.createStarter(this.players.players[this.actualPlayer].lv)
-		this.addEventKey()
-	}
-	render = () => {
-		this.rendertics++
-		if (!this.isPause && !this.wait) {
-			// ASTEROIDS
-			this.asteroids.renderAsteroids()
-			// PROJECTILS
-			this.projectils.renderProjectils()
-			// PLAYERS
-			this.players.renderPlayer()
-		}
 	}
 	giveDelay = (time) => {
 		return new Promise(resolve => setTimeout(resolve, time));
@@ -681,7 +730,7 @@ class Asteroid {
 			},
 			getNewAsteroid: (lv = 1, parentAsteroid = false) => {
 				let immat = this.asteroids.asteroidImmat
-				let ratio = (.7 * (lv === 0 ? 1 : lv))
+				let ratio = (.5 * (lv === 0 ? 1 : lv))
 				let asteroid = {
 					immat: immat,
 					speed: 2,
@@ -705,13 +754,11 @@ class Asteroid {
 					div: Object,
 				}
 				if (lv === 0 && !parentAsteroid) {
-					console.log('orbital')
 					let distance = 150
 					this.asteroids.tetha = (this.asteroids.tetha > 315 ? 0 : this.asteroids.tetha + 400 / 8)
 					asteroid.d = this.asteroids.tetha
 					asteroid.x = asteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
 					asteroid.y = asteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
-					console.log(asteroid.d)
 				}
 				if (parentAsteroid) {
 					let distance = 10
