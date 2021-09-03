@@ -466,12 +466,12 @@ class Asteroid {
 		let stringcss = '@font-face { font-family: "vectorbattle";src: url("assets/fonts/VectorBattle.ttf") format("truetype")}'
 		stringcss += 'body {overflow: hidden;font-family: vectorbattle;letter-spacing: .2rem;background-color: #202020;width: 100%;height: 100%;color:white;}'
 		stringcss += '*,::before,::after {margin: 0;padding: 0;-webkit-user-select: none;-moz-user-select: none;-ms-user-select: none;user-select: none;-webkit-box-sizing: border-box;box-sizing: border-box;}'
-		stringcss += '.asteroid {opacity: 1; animation: 0.5s linear init;}'
+		stringcss += '.asteroid {position: absolute;opacity: 1; animation: 0.5s linear init;background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
 		stringcss += '.asteroid.unarmed {animation: 0.3s linear boom;opacity: 1;}'
-		stringcss += '.asteroid.type-1 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-2 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-3 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
-		stringcss += '.asteroid.type-4 {position: absolute;background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");background-size: contain;background-repeat: no-repeat;background-position: center;width: 32px;height: 32px;top: 50%;left: 50%;transform: translate(-50%, -50%);}'
+		stringcss += '.asteroid.type-1 {background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x31_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.4 -112.7,125.4 -114.6,122.3 -108.9,122.3 -103.5,125.4 -103.5,127.3 -108.9,128.7 -103.5,132.2 -107.3,135.7 -108.9,133.8 -114.7,135.6 -118.5,130.7 \'/%3E%3C/svg%3E");				}'
+		stringcss += '.asteroid.type-2 {background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x32_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.9,122.3 -111.1,124 -107.3,122.3 -103.5,125.7 -107.3,127.5 -103.5,130.8 -107.2,135.7 -113,134 -114.9,135.7 -118.5,132.4 -116.7,129 \'/%3E%3C/svg%3E ");					}'
+		stringcss += '.asteroid.type-3 {background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");										}'
+		stringcss += '.asteroid.type-4 {background-image: url("data:image/svg+xml,%3C%3Fxml version=\'1.0\' encoding=\'utf-8\'%3F%3E%3C!-- Generator: auto --%3E%3Csvg version=\'1.1\' id=\'Calque_1\' xmlns=\'http://www.w3.org/2000/svg\' xmlns:xlink=\'http://www.w3.org/1999/xlink\' x=\'0px\' y=\'0px\' viewBox=\'-119 121 16 16\' style=\'enable-background:new -119 121 16 16;\' xml:space=\'preserve\'%3E%3Cpolygon id=\'_x33_\' style=\'fill:none;stroke:%23FFFFFF;stroke-width:0.5;vector-effect:non-scaling-stroke;stroke-linecap:square;stroke-linejoin:bevel;stroke-miterlimit:10;\' points=\' -118.5,125.7 -114.8,122.3 -111,125.7 -107.3,122.3 -103.5,125.8 -105.4,129 -103.5,132.3 -109.3,135.7 -114.7,135.7 -118.5,132.3 \'/%3E%3C/svg%3E%0A");										}'
 		stringcss += '@keyframes boom {from {transform: scale(1);opacity: 1;}to {transform: scale(2);opacity: 0;animation-play-state: paused;}}'
 		stringcss += '@keyframes init {from {opacity: 0;}to {opacity: 1;}}'
 		// --
@@ -732,50 +732,50 @@ class Asteroid {
 			},
 			getNewAsteroid: (parentAsteroid = false) => {
 				let lv = parentAsteroid ? parentAsteroid.lv : 1
-				if (lv < 4) {
-					let immat = this.asteroids.asteroidImmat
-					let ratio = (.5 * (lv === 0 ? 1 : lv))
-					let asteroid = {
-						immat: immat,
-						speed: 2,
-						type: 'asteroid',
-						nearest: false,
-						x: this.center.x,
-						y: this.center.y,
-						z: this.center.z,
-						d: 0,
-						w: 32 / ratio,
-						h: 32 / ratio,
-						l: 32 / ratio, // 3d
-						// range 
-						range: {
-							x: 32 / ratio,
-							y: 32 / ratio,
-							z: 32 / ratio
-						},
-						pts: 50 * lv,
-						lv: 1,
-						div: Object,
-					}
-					if (!parentAsteroid) {
-						let distance = 150
-						this.asteroids.tetha = (this.asteroids.tetha > 315 ? 0 : this.asteroids.tetha + 400 / 8)
-						asteroid.d = this.asteroids.tetha
-						asteroid.x = asteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
-						asteroid.y = asteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
-					}
-					if (parentAsteroid) {
-						let distance = 10
-						this.asteroids.tetha = (this.asteroids.tetha > 400 ? 0 : this.asteroids.tetha + 45)
-						asteroid.d = this.asteroids.tetha
-						asteroid.x = parentAsteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
-						asteroid.y = parentAsteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
-						console.log(asteroid.d)
-						asteroid.lv = parentAsteroid.lv + 1
-					}
-					this.asteroids.asteroidImmat++
-					this.asteroids.addtostack(asteroid)
+				// if (lv < 999) {
+				let immat = this.asteroids.asteroidImmat
+				let ratio = lv < 4 ? (.4 * (lv)) : (.4 * 4)
+				let asteroid = {
+					immat: immat,
+					speed: 2,
+					type: 'asteroid',
+					nearest: false,
+					x: this.center.x,
+					y: this.center.y,
+					z: this.center.z,
+					d: 0,
+					w: 32 / ratio,
+					h: 32 / ratio,
+					l: 32 / ratio, // 3d
+					// range 
+					range: {
+						x: 32 / ratio,
+						y: 32 / ratio,
+						z: 32 / ratio
+					},
+					pts: 50 * lv,
+					lv: 1,
+					div: Object,
 				}
+				if (!parentAsteroid) {
+					let distance = 150
+					this.asteroids.tetha = (this.asteroids.tetha > 315 ? 0 : this.asteroids.tetha + 400 / 8)
+					asteroid.d = this.asteroids.tetha
+					asteroid.x = asteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
+					asteroid.y = asteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
+				}
+				if (parentAsteroid) {
+					let distance = 10
+					this.asteroids.tetha = (this.asteroids.tetha > 400 ? 0 : this.asteroids.tetha + 45)
+					asteroid.d = this.asteroids.tetha
+					asteroid.x = parentAsteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
+					asteroid.y = parentAsteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
+					console.log(asteroid.d)
+					asteroid.lv = parentAsteroid.lv + (lv < 4 ? 1 : 0)
+				}
+				this.asteroids.asteroidImmat++
+				this.asteroids.addtostack(asteroid)
+				// }
 			},
 			addtostack: (asteroid) => {
 				asteroid.div = this.divMaker(asteroid.type, asteroid, false)
