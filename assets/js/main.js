@@ -729,7 +729,6 @@ class Asteroid {
 					asteroid.d = this.asteroids.tetha
 					asteroid.x = parentAsteroid.x + Math.round((distance) * (Math.cos(asteroid.d * (180 / Math.PI))));
 					asteroid.y = parentAsteroid.y + Math.round((distance) * (Math.sin(asteroid.d * (180 / Math.PI))));
-					console.log(asteroid.d)
 					asteroid.lv = parentAsteroid.lv + (lv < 4 ? 1 : 0)
 				}
 				this.asteroids.asteroidImmat++
@@ -817,6 +816,7 @@ class Asteroid {
 							asteroid.div.textContent = "BOOM"
 
 							this.front.addScore(asteroid)
+							projectil.div.remove()
 							this.projectils.addToDeleteList(projectilIndex)
 							this.asteroids.addToDeleteList(asteroidkey)
 						}
@@ -925,15 +925,13 @@ class Asteroid {
 				projectil.div.style.transform = 'rotate(' + (projectil.d + 90) + 'deg)'
 			},
 			addToDeleteList: (projectilIndex) => {
-
-				let projectil = this.projectils.projectils[projectilIndex]
-				projectil.div.remove()
 				this.projectils.projectilstodelete.push(projectilIndex)
 			},
 			clearDeleteList: () => {
 				// delete projectil
 				if (this.projectils.projectilstodelete.length > 0) {
 					this.projectils.projectilstodelete.forEach(projectilIndex => {
+
 						this.projectils.projectils.splice(projectilIndex, 1);
 					})
 					this.projectils.projectilstodelete = []
